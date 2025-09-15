@@ -1,12 +1,14 @@
 Contexte:
-Nous auditons une application web / Blazor / SPA pour la neuro‑accessibilité (TSA / TDAH). 
+Nous auditons une application web / Blazor / SPA pour la neuro‑accessibilité (TSA / TDAH).
 Objectif: Réduire surcharge cognitive, améliorer prévisibilité, contrôlabilité, orientation et régulation attentionnelle, limiter stimuli inutiles.
 
 Bases neurocognitives (références DSM-5 et littérature cognitive appliquée) à intégrer dans l’analyse sans pathologiser:
+
 - TSA: (a) Difficultés d’intégration multi-sensorielle, (b) Sensibilité accrue (visuelle/auditive/motion), (c) Prévisibilité/routine vs changements implicites, (d) Traitement en détail → importance des repères hiérarchiques clairs, (e) Charge d’exécution pour transitions contextuelles.
 - TDAH: (a) Vulnérabilité à la distraction externe/interne, (b) Difficulté de maintien de but sous charge visuelle/interactionnelle, (c) Besoin de feedback immédiat, (d) Fragmentation attentionnelle si navigation / state change silencieux, (e) Mémoire de travail limitée → nécessité d’éléments persistants et d’agrégation.
 
 Normes & référentiels à relier explicitement:
+
 - WCAG 2.2 (Perceivable, Operable, Understandable, Robust) + critères pertinents (2.4.x, 1.3.x, 3.2.x, 2.2.x, 3.3.x, 2.5.x, 2.4.13).
 - Design inclusif (Microsoft Inclusive Design), Curb-cut principle.
 - Cognitive load theory (intrinsèque, extrinsèque, germane): réduire extrinsèque, stabiliser ressources.
@@ -15,6 +17,7 @@ Normes & référentiels à relier explicitement:
 - Progressive Disclosure & Minimal Necessary Stimulus.
 
 Domaine d’audit (adapter selon projet):
+
 1. Structure & Landmarks (sémantique HTML / divisions logiques).
 2. Navigation & Orientation (focus order, skip link, aria-current, fil d’Ariane).
 3. Hiérarchie & Titres (H1 unique, niveaux cohérents, densité).
@@ -38,6 +41,7 @@ Domaine d’audit (adapter selon projet):
 
 Format de sortie attendu (tableau ou JSON structuré):
 Pour chaque point:
+
 - id
 - Catégorie
 - Problème détecté (factuel, observable)
@@ -51,17 +55,19 @@ Pour chaque point:
 - Alternative progressive (quick win) / Remédiation complète
 - Indicateur de validation (metric: ex. “Focus visible sur 100% des éléments interactifs via test automatisé”)
 - Effort estimé (S, M, L)
-- Priorité (calcul = f(gravité * fréquence * coût retard))
+- Priorité (calcul = f(gravité _ fréquence _ coût retard))
 - Statut (Backlog / En cours / Implémenté)
 - Tag (structure, focus, feedback, mouvement, lisibilité, etc.)
 
 Exigences qualitatives:
+
 - Pas de formulation vague (“améliorer l’UX”), préférer “Ajouter un bouton ‘Skip to content’ positionné avant header, visible au focus”.
 - Lier chaque recommandation à un mécanisme cognitif précis (ex: “réduit charge extrinsèque”, “stabilise repères sériels”).
 - Mentionner quand un problème devient critique combiné à un autre (ex: “Focus invisible + redirection implicite”).
 - Séparer “Quick Win” vs “Refonte” pour hiérarchisation.
 
 Output final:
+
 1. Résumé exécutif (5–10 lignes).
 2. Tableau complet.
 3. Roadmap lots (Sprints).
