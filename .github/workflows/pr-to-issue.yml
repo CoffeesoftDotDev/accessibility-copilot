@@ -25,108 +25,24 @@ jobs:
               pull_number: context.issue.number
             });
 
-            // First, create the issue and try assigning Copilot directly during creation
-            let issue;
-            try {
-              console.log('Method 0: Creating issue with Copilot assigned from the start');
-              const { data: issueWithCopilot } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Review PR #${pr.number}: ${pr.title}`,
-                body: `## 🔗 Linked Pull Request
+            // First, create the issue without assignees
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Review PR #${pr.number}: ${pr.title}`,
+              body: `## 🔗 Linked Pull Request
             
             **PR:** #${pr.number} - ${pr.title}
             **Author:** @${pr.user.login}
             **URL:** ${pr.html_url}
             `,
-                labels: ['neurodiversity-check'],
-                assignees: ['copilot']
-              });
-              
-              issue = issueWithCopilot;
-              
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
-              });
-              
-              console.log('Successfully created issue with Copilot assigned from the start');
-              return;
-              
-            } catch (createError) {
-              console.log('Creating issue with Copilot assignment failed:', createError.message);
-              
-              // Fallback: create issue without assignees
-              const { data: issueWithoutAssignees } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Review PR #${pr.number}: ${pr.title}`,
-                body: `## 🔗 Linked Pull Request
-            
-            **PR:** #${pr.number} - ${pr.title}
-            **Author:** @${pr.user.login}
-            **URL:** ${pr.html_url}
-            `,
-                labels: ['neurodiversity-check']
-              });
-              
-              issue = issueWithoutAssignees;
-            }
+              labels: ['neurodiversity-check']
+            });
 
             // Now assign the issue to Copilot using multiple methods
             try {
               console.log('Attempting to assign issue to Copilot...');
-              
-              // Method 1: Try direct assignment with the exact Copilot username
-              try {
-                console.log('Trying Method 1: Direct REST API assignment with copilot username');
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: ['github-copilot[bot]']
-                });
-                
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: pr.number,
-                  body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
-                });
-                
-                console.log('Successfully assigned issue to Copilot using Method 1');
-                return;
-                
-              } catch (method1Error) {
-                console.log('Method 1 failed:', method1Error.message);
-              }
-
-              // Method 2: Try with copilot username without [bot]
-              try {
-                console.log('Trying Method 2: Direct REST API assignment with copilot');
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: ['copilot']
-                });
-                
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: pr.number,
-                  body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
-                });
-                
-                console.log('Successfully assigned issue to Copilot using Method 2');
-                return;
-                
-              } catch (method2Error) {
-                console.log('Method 2 failed:', method2Error.message);
-              }
-
+            
               // Method 3: GraphQL approach to find and assign Copilot
               console.log('Trying Method 3: GraphQL approach');
               const repoQuery = `
