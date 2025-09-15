@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      pull-requests: read
+      pull-requests: write
+      contents: read
+      repository-projects: read
     
     steps:
       - name: Create Issue for PR
@@ -39,7 +41,32 @@ jobs:
 
             // Now assign the issue to Copilot using GraphQL API
             try {
-              // First, get the repository ID and check if Copilot is available
+              // First, try to assign directly using REST API with 'copilot'
+              console.log('Attempting to assign issue to Copilot...');
+              
+              try {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: ['copilot']
+                });
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
+                });
+                
+                console.log('Successfully assigned issue to Copilot using REST API');
+                return;
+                
+              } catch (restError) {
+                console.log('REST API assignment failed, trying GraphQL approach:', restError.message);
+              }
+
+              // If REST API fails, try GraphQL approach with better debugging
               const repoQuery = `
                 query {
                   repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
@@ -61,17 +88,23 @@ jobs:
               `;
 
               const repoResult = await github.graphql(repoQuery);
+              
+              // Debug: Log all available actors
+              console.log('Available suggested actors:', JSON.stringify(repoResult.repository.suggestedActors.nodes, null, 2));
+              
+              // Look for Copilot with different possible login names
               const copilotBot = repoResult.repository.suggestedActors.nodes.find(
-                actor => actor.login === 'copilot-swe-agent'
+                actor => actor.login === 'copilot-swe-agent' || actor.login === 'copilot' || actor.login.includes('copilot')
               );
 
               if (!copilotBot) {
-                console.log('Copilot coding agent is not available in this repository');
+                console.log('Copilot coding agent is not available in this repository or not found in suggested actors');
+                console.log('Available actors:', repoResult.repository.suggestedActors.nodes.map(actor => actor.login));
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body: `🤖 Review issue created: #${issue.number}\n\n⚠️ Note: Copilot coding agent is not available in this repository, so the issue was not automatically assigned to Copilot.`
+                  issue_number: pr.number,
+                  body: `🤖 Review issue created: #${issue.number}\n\n⚠️ Note: Copilot coding agent was not found in the repository's suggested actors. Available actors: ${repoResult.repository.suggestedActors.nodes.map(actor => actor.login).join(', ')}`
                 });
                 return;
               }
@@ -118,7 +151,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: pr.number,
                 body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
               });
 
@@ -127,7 +160,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: pr.number,
                 body: `🤖 Review issue created: #${issue.number}\n\n⚠️ Failed to assign to Copilot coding agent: ${error.message}`
               });
             }
