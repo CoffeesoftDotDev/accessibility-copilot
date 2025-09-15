@@ -33,3 +33,7 @@ Permettre de sauvegarder un formulaire pour le finir plus tard.</br>
 
 # Resources : 
 [gh model in actions](https://github.blog/ai-and-ml/generative-ai/automate-your-project-with-github-models-in-actions/)
+[gh coding agent to work on an issue](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/coding-agent/assign-copilot-to-an-issue)
+[gh about](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent)
+[gh custom instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)
+[gh cli in workflow](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-github-cli)
