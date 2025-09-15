@@ -29,3 +29,7 @@ Pré-remplir les champs déjà connus.</br>
 Supprimer les limites de temps ou permettre de les ajuster.</br>
 Permettre de sauvegarder un formulaire pour le finir plus tard.</br>
 Éviter les estimations de durée : préférer “10 questions” à “5 minutes”.</br>
+
+
+# Resources : 
+[gh model in actions](https://github.blog/ai-and-ml/generative-ai/automate-your-project-with-github-models-in-actions/)
