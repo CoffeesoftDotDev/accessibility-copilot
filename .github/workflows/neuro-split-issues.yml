@@ -69,5 +69,5 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
         env:
-          PROMPTS_FILE: prompts/issue-summary.prompt.yml
+          PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
           CONTENT: ${{ steps.pr_report_details.outputs.report }}
