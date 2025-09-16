@@ -22,7 +22,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const senderLogin = context?.payload?.pull_request?.sender.login) || null;
+            const senderLogin = context?.payload?.pull_request?.sender.login || null;
             console.log('github.event.pull_request.sender.login:', senderLogin);
 
             const startsWithCopilot = typeof senderLogin === 'string' && senderLogin.startsWith('Copilot');
