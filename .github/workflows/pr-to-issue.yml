@@ -133,6 +133,9 @@ jobs:
               `;
 
               await github.graphql(assignMutation);
+              
+              console.log('issueResult:', JSON.stringify(issueResult, null, 2));
+              console.log('issueResult.repository.issue:', JSON.stringify(issueResult.repository.issue, null, 2));
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
