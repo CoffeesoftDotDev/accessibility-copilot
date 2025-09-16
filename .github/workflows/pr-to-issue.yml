@@ -22,7 +22,6 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const context = github.context;
             console.log('Full context:', JSON.stringify(context, null, 2));
       - name: Cancel workflow if PR is from copilot agent
         if: startsWith(github.event.pull_request.sender.login, 'Copilot')
