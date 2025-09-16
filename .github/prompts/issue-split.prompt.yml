@@ -7,9 +7,9 @@ jsonSchema: |-
     "name": "describe_multiple_animals",
     "strict": true,
     "schema": {
-      "type": "array",
+      "type": "object",
       "items": {
-        "type": "object",
+        "type": "array",
         "properties": {
           "title": {
             "type": "string",
