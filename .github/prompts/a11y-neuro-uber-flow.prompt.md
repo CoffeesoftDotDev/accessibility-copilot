@@ -2,12 +2,14 @@
 mode: 'agent'
 description: 'Orchestrated neuro-inclusive accessibility mega audit (static code + content + cognitive flows + synthesis)'
 tools: ['codebase', 'usages', 'problems', 'openSimpleBrowser', 'fetch', 'todos']
-outputs: ['overviewReport','staticCodeFindings','contentFindings','flowReport','consolidatedRiskMatrix','actionPlan','metricsGapReport']
+outputs: ['overviewReport','staticCodeFindings','contentFindings','flowReport','consolidatedRiskMatrix','actionPlan','metricsGapReport','issuesBacklog']
 ---
 # Neuro-Inclusive Accessibility Mega Audit ("Uber Flow")
 
 ## Purpose
 Provide an end‑to‑end consolidated audit that sequences: Overview → Static Code → Content & Microcopy → Cognitive Multi‑Step Flows → Synthesis & Risk → Action & Metrics. Leverages and embeds the existing specialized prompts (overview, static code, content, cognitive flow) into a single deterministic output for executive + implementation consumption.
+
+NEW: After generating the full 15-section report, also generate a structured remediation Issues Backlog suitable for direct GitHub issue creation.
 
 
 ### Spec Reference Index (Anchor for §6–§23)
@@ -50,6 +52,8 @@ ACTION_EFFORT_SCALE: XS|S|M|L|XL (default set applied)
 ```
 
 If `OUTPUT_FORMAT=json` produce ONLY a final JSON object conforming to `UnifiedAuditJSON` schema (see below). If `hybrid`, produce normal markdown THEN append a JSON block.
+
+If `OUTPUT_FORMAT` is `markdown` or `hybrid`, append an "Issues Backlog" section AFTER Section 15 (or supply as separate top-level JSON array when `json`) describing one issue per distinct risk plus any composite remediation actions (so that each `risk.id` appears in ≥1 issue). See "Issue Backlog Specification" below.
 
 ### UnifiedAuditJSON (Minimal Schema for Automation)
 ```
@@ -159,6 +163,7 @@ Items describing the same root cause (same file + element role + dimension) MUST
 13. Change Impact Forecast (qualitative ROI & risk reduction per top 5 actions).
 14. Appendix A: Raw Observations (phase-tagged).
 15. Appendix B: Method & Normalization Notes.
+16. (Added) Issues Backlog (GitHub-ready) – only for markdown or hybrid; for json include under key `issuesBacklog`.
 
 ## Coverage Snapshot (Template)
 | Area | Status | Notes | Ref Section |
@@ -196,6 +201,75 @@ Signals list seeds: draft_restored, undo_action, layout_shift_feedback, reduced_
 
 Only populate when an item is deferred beyond P2.
 
+## Issue Backlog Specification (New)
+Provide a machine-parseable list of issues to create. Each issue must map at least one `risk.id`. Combine closely related risks into one issue only when implementation logically shares the same code touch points (e.g., keyboard + semantics for the same control). Otherwise keep one issue per risk.
+
+Markdown Format (table AND enumerated detail cards):
+
+### Issues Backlog Table
+| Issue Key | Title | Mapped Risk IDs | Priority (P1/P2/P3) | Effort | Spec Refs | Personas | Acceptance Criteria (Condensed) |
+|-----------|-------|-----------------|---------------------|--------|-----------|----------|----------------------------------|
+
+Detail Card Template (one per issue, following the table):
+```
+#### Issue: <Issue Key> – <Title>
+Linked Risks: <risk ids>
+Priority: P1
+Effort: S|M|L (copy from action plan or derived)
+Spec References: §8, §10
+Personas Impacted: TSA, ADHD
+
+Problem
+<Short paragraph summarizing evidence merging referenced risk.evidence values (truncate if >400 chars).>
+
+Why It Matters
+<Persona-focused impact statement referencing dimensions.>
+
+Acceptance Criteria
+- [ ] Bullet criteria (#1)
+- [ ] Bullet criteria (#2)
+Telemetry (If Applicable)
+- Suggested Signal(s): <signal names>
+
+Dependencies
+- (Optional list)
+
+Out-of-Scope
+- (Optional) Items intentionally excluded.
+```
+
+Issue Key Pattern: `A11Y-<increment>` starting at 1 (e.g., A11Y-1). Deterministic ordering: P1 issues first (sort by risk id), then P2, then P3.
+
+JSON Mode (`OUTPUT_FORMAT=json`): Provide an `issuesBacklog` array of objects:
+```
+{
+  "issueKey": "A11Y-1",
+  "title": "Make cart icon keyboard accessible",
+  "riskIds": ["Keyboard-cart-icon-1","Semantics-cart-icon-1"],
+  "priority": "P1",
+  "effort": "S",
+  "specRefs": ["§8","§10"],
+  "personas": ["TSA","ADHD"],
+  "acceptanceCriteria": ["Cart trigger is a native button with aria-label","Focus visible outline present","Enter/Space activates cart"],
+  "telemetrySignals": ["add_to_cart"],
+  "problem": "...",
+  "whyItMatters": "..."
+}
+```
+
+Rules:
+- Every risk id must appear in ≥1 issue.
+- Each P1 risk must have a dedicated or combined issue (not merged with unrelated code domains).
+- Acceptance criteria must be testable statements (start with a verb, no conjunctions that hide multiple conditions).
+- Telemetry signals only if previously listed in metrics gaps mapping.
+
+Effort Inference:
+- If actionPlan specifies effort, reuse.
+- If not, map severity High->M (unless trivial), Medium->M/S depending on scope, Low->S/XS.
+
+Failure Handling:
+- If a risk has no clear remediation path, still create an issue with placeholder acceptance criterion: "Remediation approach defined and approved".
+
 ## Constraints
 - MUST include every mandated section even if empty → write "None Found" or "(empty)".
 - Sentence soft limit 20 words (executive + recommendations); technical evidence can exceed.
@@ -215,6 +289,7 @@ Only populate when an item is deferred beyond P2.
 8. No speculative architectural claims; each evidence cites file, component, or literal snippet.
 9. JSON in Static Code section validates (syntactic structure, quoted keys & strings).
 10. Executive Summary ≤10 bullets, each ≤18 words.
+11. Issues Backlog produced: every risk.id mapped; table plus detail cards (markdown) or `issuesBacklog` array (json); no missing spec refs.
 
 ## Normalization & Merging Algorithm (Guidance for Agent Internals)
 1. Collect raw finding objects from phases (treat each row or bullet as candidate).
