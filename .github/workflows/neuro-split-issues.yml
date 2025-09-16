@@ -1,0 +1,28 @@
+name: Pull request review issues creation
+on: 
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  test_action:
+    if: contains()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install GH Models Extension 
+        run: gh extension install https://github.com/github/gh-models
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Echo Context 
+        run: echo "$GITHUB_CONTEXT"
+  #    - name: Generate Issue Descriptions
+   #     id: gen_issues
+    #    run: |-
+          
+#      - name: Create issues for PR reviews
+ #       uses: ./
+  #      with:
+   #       azure_ai_project_endpoint: ${{ secrets.AZURE_AI_PROJECT_ENDPOINT }}
+    #      model_deployment_name: "gpt-4.1"
+        
