@@ -6,13 +6,14 @@ on:
 
 jobs:
   create-issue:
+    if: ${{ !contains(toLower(github.event.pull_request.user.login), 'copilot') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
       contents: read
       repository-projects: read
-    
+      
     steps:
       - name: Create Issue for PR
         uses: actions/github-script@v8
@@ -75,9 +76,9 @@ jobs:
                 actor => {
                   const login = actor.login.toLowerCase();
                   return login === 'copilot-swe-agent' || 
-                         login === 'copilot' || 
-                         login === 'github-copilot[bot]' ||
-                         login.includes('copilot');
+                          login === 'copilot' || 
+                          login === 'github-copilot[bot]' ||
+                          login.includes('copilot');
                 }
               );
 
