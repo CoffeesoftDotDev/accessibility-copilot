@@ -107,7 +107,8 @@ jobs:
 
               const issueResult = await github.graphql(issueQuery);
               const issueId = issueResult.repository.issue.id;
-
+              console.log(`Assigning issue ${issueId} to Copilot bot ${copilotBot.login} (${copilotBot.id})`);
+              
               // Assign the issue to Copilot
               const assignMutation = `
                 mutation {
