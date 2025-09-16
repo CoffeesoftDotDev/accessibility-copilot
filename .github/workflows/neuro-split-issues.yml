@@ -61,16 +61,16 @@ jobs:
 
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
-          ISSUES_TO_CREATE="$(gh models run --file "$PROMPTS_FILE" --var input="$CONTENT")"
+          echo "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
 
           echo "=== Raw model output (start) ==="
-          printf '%s\n' "$ISSUES_TO_CREATE"
+          printf '%s\n' "$(cat issues.json)"
           echo "=== Raw model output (end) ==="
 
           # Exporte aussi comme output du step (pour job outputs / needs.*)
           {
             echo 'issues<<EOF'
-            printf '%s\n' "$ISSUES_TO_CREATE"
+            printf '%s\n' "$(cat issues.json)"
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
         env:
