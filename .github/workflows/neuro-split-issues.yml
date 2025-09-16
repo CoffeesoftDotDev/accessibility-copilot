@@ -3,7 +3,7 @@ on:
   pull_request_review:
     types: [submitted]
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   test_action:
