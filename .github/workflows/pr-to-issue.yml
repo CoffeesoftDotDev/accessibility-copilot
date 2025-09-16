@@ -6,7 +6,7 @@ on:
 
 jobs:
   create-issue:
-    if: ${{ !contains(toLower(github.event.pull_request.user.login), 'copilot') }}
+    if: ${{ !contains(lower(github.event.pull_request.user.login), 'copilot') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
