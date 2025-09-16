@@ -17,7 +17,7 @@ jobs:
       - name: Create Issue for PR
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           script: |
             const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
