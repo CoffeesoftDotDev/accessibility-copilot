@@ -6,7 +6,6 @@ on:
     types: [opened, edited]
 
 permissions:
-  repository: read
   issues: write
   contents: read
   models: read
