@@ -56,8 +56,8 @@ jobs:
           cat issues.json
           # echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_OUTPUT"
-          if jq -e '.issues' model_output.json > /dev/null; then
-            issues=$(jq -c '.issues' model_output.json)
+          if jq -e '.issues' issues.json > /dev/null; then
+            issues=$(jq -c '.issues' issues.json)
             echo "issues=$issues" >> "$GITHUB_OUTPUT"
           else
             echo "No valid 'issues' array found in model output."
