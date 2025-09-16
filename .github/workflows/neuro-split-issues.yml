@@ -78,15 +78,28 @@ jobs:
     steps:
       - name: Create GitHub Issue
         run: |
-          title="${{ matrix.issue.title }}"
-          body="${{ matrix.issue.body }}"
-          
+          echo "Raw ISSUE input:"
+          echo "$ISSUE"
+      
+          # Extract fields safely
+          title="$(echo "$ISSUE" | jq -r '.title')"
+          body="$(echo "$ISSUE" | jq -r '.body')"
+          label="$(echo "$ISSUE" | jq -r '.label')"
+      
+          # Defensive checks
           if [[ -z "$title" || -z "$body" ]]; then
-            echo "Skipping empty issue..."
+            echo "Skipping empty or invalid issue..."
             exit 0
           fi
-
-          echo "Creating issue: $title"
-          gh issue create --title "$title" --body "$body"
+      
+          echo "Creating issue with title: $title"
+          echo "Label: $label"
+      
+          # Use gh issue create with safe quoting
+          gh issue create \
+            --title "$title" \
+            --body "$body" \
+            --label "$label"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ toJson(matrix.issue) }}
