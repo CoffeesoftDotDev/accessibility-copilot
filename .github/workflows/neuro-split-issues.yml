@@ -6,6 +6,7 @@ on:
     types: [opened, edited]
 
 permissions:
+  repository: read
   issues: write
   contents: read
   models: read
@@ -54,15 +55,6 @@ jobs:
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: gen_issues
         run: |-
-          set -euo pipefail
-
-          read -r -d '' CONTENT <<EOF
-            ${{ steps.pr_report_details.outputs.report }}
-          EOF
-          
-          # Récupère le contenu (JSON une ligne) produit par le step précédent
-          # CONTENT='${{ steps.pr_report_details.outputs.report }}'
-
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
           printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
@@ -78,4 +70,5 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
         env:
-          PROMPTS_FILE: "prompts/issue-summary.prompt.yml"
+          PROMPTS_FILE: prompts/issue-summary.prompt.yml
+          CONTENT: ${{ steps.pr_report_details.outputs.report }}
