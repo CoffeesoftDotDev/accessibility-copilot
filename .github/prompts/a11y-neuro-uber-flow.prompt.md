@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: 'Orchestrated neuro-inclusive accessibility mega audit (static code + content + cognitive flows + synthesis)'
-tools: ['search','codebase','editFiles','runTests','problems','terminalLastCommand','usages','openSimpleBrowser','fetch','changes']
+tools: ['codebase', 'usages', 'problems', 'openSimpleBrowser', 'fetch', 'todos']
 outputs: ['overviewReport','staticCodeFindings','contentFindings','flowReport','consolidatedRiskMatrix','actionPlan','metricsGapReport']
 ---
 # Neuro-Inclusive Accessibility Mega Audit ("Uber Flow")

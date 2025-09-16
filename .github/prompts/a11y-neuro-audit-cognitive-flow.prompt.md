@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: 'Audit multi-step cognitive flows with autistic (ASC) / ADHD support focus'
-tools: ['search','codebase','runTests','openSimpleBrowser','terminalLastCommand']
+tools: ['codebase','fetch', 'todos']
 outputs: ['flowReport','personaMatrix']
 ---
 

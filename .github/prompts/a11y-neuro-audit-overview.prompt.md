@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: 'Conduct a neuro-inclusive accessibility audit overview (WCAG 2.2 + TSA/ADHD cognitive model)'
-tools: ['search','codebase','editFiles','runTests','problems','terminalLastCommand','usages','changes']
+tools: ['codebase','fetch','problems','usages','todos']
 outputs: ['report','checklist','riskMatrix']
 ---
 # Neuro-Inclusive Accessibility Audit (Overview)

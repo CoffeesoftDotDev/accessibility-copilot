@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: 'Microcopy & surface text audit – cognitive load optimization (ASD / ADHD) + semantic accessibility'
-tools: ['search','codebase','runTests','usages']
+tools: ['codebase', 'usages', 'todos']
 outputs: ['contentFindings','readabilityStats','cognitiveHeuristics']
 ---
 
