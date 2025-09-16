@@ -5,8 +5,7 @@ on:
     types: [opened]
 
 jobs:
-  create-issue:
-    if: ${{ !contains(lower(github.event.sender.login), 'copilot') }}
+  create-issue:   
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -20,6 +19,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}            
       - name: Create Issue for PR
+        if: ${{ !contains(lower(github.event.sender.login), 'copilot') }}
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PAT }}
