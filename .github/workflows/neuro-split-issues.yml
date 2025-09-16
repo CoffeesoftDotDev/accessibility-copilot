@@ -2,27 +2,54 @@ name: Pull request review issues creation
 on: 
   pull_request_review:
     types: [submitted]
+  issues:
+    types: [opened]
 
 jobs:
   test_action:
-    if: contains()
     runs-on: ubuntu-latest
+    outputs: 
+      report: ${{ steps.pr_report_details.outputs.report }}
+      issues: ${{ steps.gen_issues.outputs.issues }}
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-      - name: Install GH Models Extension 
+
+      - name: Install gh-models extension
         run: gh extension install https://github.com/github/gh-models
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Echo Context 
+
+      - name: Echo context (debug)
         run: echo "$GITHUB_CONTEXT"
-  #    - name: Generate Issue Descriptions
-   #     id: gen_issues
-    #    run: |-
-          
-#      - name: Create issues for PR reviews
- #       uses: ./
-  #      with:
-   #       azure_ai_project_endpoint: ${{ secrets.AZURE_AI_PROJECT_ENDPOINT }}
-    #      model_deployment_name: "gpt-4.1"
-        
+
+      - name: Get PR report details
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        id: pr_report_details
+        run: |-
+          # Déterminer le numéro (PR review event vs issue event)
+          ISSUE_NB="${{ github.event.pull_request.number || github.event.issue.number }}"
+
+          if [ -z "$ISSUE_NB" ]; then
+            echo "Aucun numéro d'issue/PR détecté dans ce type d'événement."
+            echo "report={}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+            # Récupère titre + body au format JSON
+          JSON=$(gh issue view "$ISSUE_NB" --json number,title,body,url)
+
+          # Compacte en une seule ligne (retire retours)
+          JSON_ONELINE=$(echo "$JSON" | tr '\n' ' ')
+
+          # Publie dans les outputs
+          echo "report=$JSON_ONELINE" >> "$GITHUB_OUTPUT"
+
+      - name: Generate Issue Descriptions
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        id: gen_issues
+        run: |-
+          CONTENT="${{ steps.pr_report_details.outputs.report }}"
+          ISSUES_TO_CREATE=$(gh models generate-issue --content "$CONTENT")
+          echo "issues=$ISSUES_TO_CREATE" >> "$GITHUB_OUTPUT"
+
