@@ -136,7 +136,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: pr.number,
-                body: `🤖 Review issue created: #${issue.number}\n\n✅ Issue has been assigned to Copilot coding agent for automated review.`
+                body: `🤖 #${copilotBot.login} execute prompts located in .github/prompts/code-a11y-review.prompt.md`
               });
 
             } catch (error) {
