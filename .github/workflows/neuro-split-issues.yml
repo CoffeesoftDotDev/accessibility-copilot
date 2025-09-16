@@ -11,14 +11,14 @@ jobs:
     outputs: 
       report: ${{ steps.pr_report_details.outputs.report }}
       issues: ${{ steps.gen_issues.outputs.issues }}
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Install gh-models extension
         run: gh extension install https://github.com/github/gh-models
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Echo context (debug)
         run: echo "$GITHUB_CONTEXT"
@@ -52,4 +52,5 @@ jobs:
           CONTENT="${{ steps.pr_report_details.outputs.report }}"
           ISSUES_TO_CREATE=$(gh models generate-issue --content "$CONTENT")
           echo "issues=$ISSUES_TO_CREATE" >> "$GITHUB_OUTPUT"
+        
 
