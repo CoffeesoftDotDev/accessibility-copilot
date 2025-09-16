@@ -6,6 +6,7 @@ on:
 
 jobs:
   create-issue:
+    if: ${{ !contains(lower(github.event.sender.login), 'copilot') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
