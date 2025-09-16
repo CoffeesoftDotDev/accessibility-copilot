@@ -54,11 +54,24 @@ jobs:
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: gen_issues
         run: |-
-          CONTENT="${{ steps.pr_report_details.outputs.report }}"
-          ISSUES_TO_CREATE=$(gh models run --file $PROMPTS_FILE --var input="$CONTENT")
-          echo "issues to create : $ISSUES_TO_CREATE"
-          echo "issues=$ISSUES_TO_CREATE" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+
+          # Récupère le contenu (JSON une ligne) produit par le step précédent
+          CONTENT='${{ steps.pr_report_details.outputs.report }}'
+
+          echo "Running model with prompt file: $PROMPTS_FILE"
+          # Exécute le modèle
+          ISSUES_TO_CREATE="$(gh models run --file "$PROMPTS_FILE" --var input="$CONTENT")"
+
+          echo "=== Raw model output (start) ==="
+          printf '%s\n' "$ISSUES_TO_CREATE"
+          echo "=== Raw model output (end) ==="
+
+          # Exporte aussi comme output du step (pour job outputs / needs.*)
+          {
+            echo 'issues<<EOF'
+            printf '%s\n' "$ISSUES_TO_CREATE"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
         env:
           PROMPTS_FILE: "prompts/issue-summary.prompt.yml"
-        
-
