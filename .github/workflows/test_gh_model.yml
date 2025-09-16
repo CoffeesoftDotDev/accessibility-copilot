@@ -3,6 +3,8 @@ name: Bug Report Reproduction Check
 on:
   issues:
     types: [opened]
+    branches:
+      - 'sample/**'
 
 permissions:
   contents: read
