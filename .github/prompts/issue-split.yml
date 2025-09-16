@@ -1,8 +1,0 @@
-name: Issue splitter
-description: Split a report into separate issues
-model: openai/gpt-5
-messages:
-  - role: system
-    content: You are a helpful issue summarizer. When given issue content, respond in markdown format.
-  - role: user
-    content: "Please summarize the following issues into a few short bullet points. Include links if provided. If possible, pull out general themes and help the team prioritize based on impact. Issues begin here:\n {{input}}"
