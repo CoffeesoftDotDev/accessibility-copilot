@@ -18,13 +18,8 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-      - name: Help me !
-        uses: actions/github-script@v8
-        with:
-          script: |
-            console.log('Full context:', JSON.stringify(context, null, 2));
       - name: Cancel workflow if PR is from copilot agent
-        if: startsWith(github.event.pull_request.sender.login, 'Copilot')
+        if: startsWith(context.payload.sender.login, 'Copilot')
         run: |
           echo "Pull request is from copilot agent. Exiting workflow."
           exit 0
@@ -33,6 +28,11 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           script: |
+            if (startsWith(context.payload.sender.login, 'Copilot')) {
+              console.log("Pull request is from copilot agent. Exiting workflow.");
+              return;
+            }
+
             const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
