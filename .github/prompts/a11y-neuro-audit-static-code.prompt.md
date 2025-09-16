@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 description: 'Static code semantic & structural accessibility audit with neuro-inclusive focus'
-tools: ['search','codebase','editFiles','problems','usages','runTests']
+tools: ['editFiles', 'search', 'usages', 'problems', 'fetch', 'runTests', 'search']
 outputs: ['issues','diffPlan']
 ---
 # Static Code Accessibility & Cognitive Support Audit

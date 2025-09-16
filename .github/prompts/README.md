@@ -8,7 +8,6 @@ Central hub for agent prompts supporting TSA / ADHD focused accessibility & cogn
 | `a11y-neuro-audit-overview.md` | Global maturity & gap snapshot | Report, checklist, risk matrix | Kick-off; executive summary; pre-planning | §§2,3,6,7,17,21,22 |
 | `a11y-neuro-audit-static-code.md` | Static semantic & structural scan | Issue list, diff plan anchors | Early code review; CI gating candidate | §§6,7,8,9,12,17,18,22 |
 | `a11y-neuro-audit-cognitive-flow.md` | Task / multi-step flow cognitive analysis | Flow report, persona friction matrix | Before/after redesign of major journey | §§2,3,6,7,8,17,21 |
-| `a11y-neuro-audit-architecture-metrics.md` | Instrumentation & resilience assessment | Metric gaps, infra findings | Before adding telemetry / scaling | §§6,8,9,12,18,21 |
 | `a11y-neuro-audit-content.md` | Microcopy clarity & structural outline audit | Content findings, readability stats | Content freeze; copy QA sprint | §§7,17,22 |
 
 ## 2. Quick Decision Guide
