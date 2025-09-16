@@ -137,7 +137,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: "${issueId}",
-                body: `🤖 @${copilotBot.login} execute prompts located in .github/prompts/code-a11y-review.prompt.md`
+                body: `🤖 execute prompts located in .github/prompts/code-a11y-review.prompt.md`
               });
 
             } catch (error) {
