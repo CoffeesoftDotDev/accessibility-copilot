@@ -1,76 +1,79 @@
 ---
 mode: 'agent'
-description: 'Conduct a neuro-inclusive accessibility audit overview (WCAG 2.2 + TSA/ADHD cognitive model)'
+description: 'Overview neuro-inclusif condensé (structure + cognition + feedback + recovery)'
 tools: ['codebase','fetch','problems','usages','todos']
-outputs: ['report','checklist','riskMatrix']
+outputs: ['report','riskMatrix']
 ---
-# Neuro-Inclusive Accessibility Audit (Overview)
+# Neuro-Inclusive Overview
 
-## Objective
-Produce a high-level status report of accessibility & neuro-inclusion maturity (Autistic Analytical, ADHD Creative, Hybrid) across: Structure, Interaction, Cognitive Support, Content, Feedback, Recovery.
+But: Synthèse haut niveau de la maturité accessibilité + soutien cognitif pour trois personae intégrées.
 
-## Inputs Required
-- Target scope path or URL(s)
-- Tech stack summary (framework, SSR/SPA, design system if any)
-- Known user journeys (at least 2 multi-step flows)
-- Existing metrics (if available): CLS, LCP, draft restore success, undo usage
+Personae (réutiliser codes):
+| Code | Persona | Besoin clé | Risques principaux |
+|------|---------|-----------|--------------------|
+| TSA  | Autistic Analytical | Structure prévisible | Shifts, ordre focus instable |
+| ADHD | ADHD Creative | Réduction surcharge & orientation | Densité interactive, libellés ambigus |
+| HYB  | Hybrid | Mix | Combinaisons ci-dessus |
 
-## Method (Phases)
-1. Inventory: List pages / views / primary components.
-2. Landmark & Heading Scan: Confirm single <main>, stable nav order, hierarchical h* outline.
-3. Interaction Layer: Identify composite widgets (menus, tabs, dialogs, grids). Map keyboard patterns.
-4. Cognitive Load Factors: Count interactive elements in initial viewport; note progressive disclosure use.
-5. Feedback & Recovery: Check presence of notification log, undo, autosave/drafts.
-6. Motion & Sensory: Detect non-essential animations, confirm motion toggle & media query respect.
-7. Persona Tension Review: For top 2 flows, list friction vs mitigation per persona (TSA, ADHD, Hybrid).
-8. Metrics & Telemetry Gap: Identify missing instrumentation signals (see a11y spec §21).
-9. Risk Scoring: Assign severity (High/Med/Low) on: Predictability, Load, Recovery, Sensory, Semantics.
-10. Action Matrix: Prioritize (P1 immediate blockers, P2 near-term, P3 backlog) referencing spec sections.
+Entrées minimales: TARGET_SCOPE, TECH_STACK, 2+ FLOWS, METRICS (CLS, undo usage si présents), DATE_AS_OF.
 
-## Output Format
-Return sections in order:
-1. Executive Summary (bullets ≤ 8)
-2. Coverage Snapshot Table
-3. Landmark & Structure Findings
-4. Cognitive & Flow Findings
-5. Feedback / Recovery & Safety Nets
-6. Motion & Sensory Summary
-7. Persona Friction Matrix
-8. Metrics & Instrumentation Gaps
-9. Risk Matrix
-10. Prioritized Recommendations
-11. Appendix: Raw Observations
+Phases condensées:
+1 Inventaire (pages, vues)  
+2 Structure (landmarks, heading, single <main>)  
+3 Interaction (widgets composites, patterns clavier)  
+4 Charge cognitive (compte contrôles, disclosure)  
+5 Feedback & Recovery (undo, autosave, notifications persistantes)  
+6 Motion & Sensoriel (animations non essentielles, respect prefers-reduced-motion)  
+7 Tensions personae (frictions vs mitigations par flow)  
+8 Metrics & instrumentation manquantes  
+9 Scoring risques (Predictability, CognitiveLoad, Recovery, Sensory, Semantics)  
+10 Priorisation (P1/P2/P3)
 
-## Tables
-### Coverage Snapshot
-| Area | Status | Notes | Ref Section |
-|------|--------|-------|-------------|
-| Landmarks | Pending |  | §6 |
-| Keyboard | Pending |  | §8 |
-| Cognitive Scaffolding | Pending |  | §2/§17 |
-| Motion Control | Pending |  | §6/§9 |
-| Recovery | Pending |  | §8/§12 |
-| Content Clarity | Pending |  | §7 |
-| Notifications | Pending |  | §18 |
+Ordre sortie attendu:
+1 Executive Summary (≤8 bullets, ≤18 mots)  
+2 Coverage Snapshot  
+3 Structure & Landmarks  
+4 Cognitive & Flow Observations  
+5 Feedback / Recovery  
+6 Motion & Sensory  
+7 Persona Friction Matrix  
+8 Metrics Gaps  
+9 Risk Matrix  
+10 Prioritized Recommendations  
+11 Appendix (Raw)  
 
-### Persona Friction Matrix (Example)
-| Flow | Persona | Friction | Mitigation Present? | Gap | Ref |
-|------|---------|----------|---------------------|-----|-----|
-| Checkout Wizard | TSA | Hidden total steps | Partially (step text missing count) | Add explicit Step X/Y | §17 |
+Coverage Snapshot:
+| Area | Status | Notes | Scope Summary |
+|------|--------|-------|---------------|
+| Landmarks | Pending |  | Single <main>, navigation stable |
+| Keyboard | Pending |  | Ordre focus logique |
+| Cognitive Scaffolding | Pending |  | Étapes visibles / indices |
+| Motion Control | Pending |  | Modération animation / toggle |
+| Recovery | Pending |  | Undo / drafts / réversibilité |
+| Content Clarity | Pending |  | Libellés explicites |
+| Notifications | Pending |  | Persistence & log |
 
-### Risk Matrix
-| Dimension | Severity | Rationale | Recommended Mitigation | Ref |
-|-----------|----------|-----------|------------------------|-----|
-| Predictability | High | Layout shift on async cards | Reserve space skeletons | §6 |
+Persona Friction Matrix:
+| Flow | Persona | Friction | Mitigation? | Gap (Action synth.) | Ref |
+|------|---------|----------|-------------|---------------------|-----|
+| Checkout | TSA | Étapes non visibles | Partielle | Ajouter Step X/Y header | §17 |
 
-## Constraints
-- Use deterministic section order.
-- Plain, literal phrasing; avoid metaphors.
-- Max 20 words per sentence (soft target).
-- Summarize changes or gaps as bullet lists.
+Risk Matrix (exemple):
+| Dimension | Severity | Rationale (≤18w) | Mitigation Pattern | Ref |
+|-----------|----------|------------------|--------------------|-----|
+| Predictability | High | Shifts sur cartes asynchrones | Réserver espace skeleton | §6 |
 
-## Acceptance Criteria
-- All sections returned (even if empty with "None Found").
-- Each recommendation references spec section (e.g., §6, §17, §22).
-- Persona matrix includes at least 2 flows.
-- No speculative claims without observation note.
+Guidelines:
+- Phrase simple, pas de métaphores
+- Statut Coverage: Completed | Partial | Gap
+- Recommandations: pattern générique, pas de code
+
+Critères d’acceptation (condensés):
+1 Toutes sections présentes (mettre "None Found" si vide)  
+2 ≥2 flows dans Persona Friction  
+3 Chaque reco possède Ref (§6… etc.)  
+4 Pas d’affirmation sans observation tangible  
+5 Bullets exécutif ≤8 et concis  
+6 Matrix risques couvre dimensions listées (None si aucune)  
+
+Fin prompt.

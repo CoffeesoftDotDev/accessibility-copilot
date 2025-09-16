@@ -10,7 +10,7 @@ Use: During refinement, pick at least TWO distinct personas—ensure proposed so
 
 ---
 
-## 1. Persona: Autistic Analytical User (TSA-Analytical)
+## 1. Persona: Autistic User (TSA-Analytical)
 | Dimension | Detail |
 |-----------|--------|
 | Core Strengths | Pattern recognition, detail orientation, consistency monitoring, error spotting |
@@ -64,7 +64,7 @@ Embed constraints: "Return deterministic section order; avoid figurative languag
 
 ---
 
-## 2. Persona: ADHD Creative Navigator (TDAH-Creative)
+## 2. Persona: ADHD  Person (TDAH-Creative)
 | Dimension | Detail |
 |-----------|--------|
 | Core Strengths | Ideation bursts, fast pattern association, exploratory discovery |

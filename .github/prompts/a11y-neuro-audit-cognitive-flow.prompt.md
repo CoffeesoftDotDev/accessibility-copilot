@@ -1,131 +1,73 @@
 ---
 mode: 'agent'
-description: 'Audit multi-step cognitive flows with autistic (ASC) / ADHD support focus'
-tools: ['codebase','fetch', 'todos']
-outputs: ['flowReport','personaMatrix']
+description: 'Audit flux cognitifs multi-étapes (version courte)'
+tools: ['codebase','fetch','todos']
+outputs: ['flowReport']
 ---
+# Cognitive Flow Audit
 
-# Cognitive Flow Audit (ASC / ADHD) — Multi-Step UX
+Objectif: Évaluer rapidement 2+ flux multi‑étapes pour orientation, prévisibilité (ASC), charge attentionnelle / mémoire (ADHD), récupération, stabilité sensorielle.
 
-## Objective
-Evaluate multi-step flows for their ability to:
-- Provide structure and predictability (Autistic / ASC needs)
-- Offload working memory and support attentional regulation (ADHD needs)
-- Prevent loss of progress and destructive actions
-- Minimize sensory overload & unexpected layout shifts
-- Support smooth resumption after interruption
+Personae:
+| Code | Besoin clé | Frictions typiques |
+|------|-----------|--------------------|
+| ASC  | Séquencement stable | Transitions brusques, ordre inattendu |
+| ADHD | Réduction distracteurs | Densité interactive, absence recap |
+| HYB  | Combinaison | Mélange des deux |
 
-## Flow Selection
-Choose ≥2 cognitively loaded flows (e.g., Checkout, Create → Publish, Multi-step Settings, Bulk Edit).
+Dimensions (regroupées 11→8 pour scoring 0–5): Orientation, Predictability, MemoryRelief, FocusControl, Recovery, Safety (Non-Destructive), FeedbackTiming+Stability, ExecLoad (synthèse).
 
-## Evaluation Dimensions (Score 0–5)
-| Dimension | Focus | 0 | 5 (Ideal) | Primary Signals |
-|-----------|-------|---|-----------|-----------------|
-| Orientation | Global wayfinding | No indicators | Visible steps + contextual state summary | Breadcrumb, Step X/Y, progress module |
-| Predictability | Anticipatable transitions (ASC) | Abrupt shifts | Announced transitions + stable states | Persistent labels, consistent sequencing |
-| Working Memory Relief | Offloading rules/data | No reminders | Minimal inline hints + recap surfaces | Hints, lateral summary, contextual recap |
-| Focus / Distraction Control | Attention scaffolding (ADHD) | Parallel cognitive pulls | Focus mode / progressive reveal | Section collapse, reduced peripheral noise |
-| Recovery | Resume after disruption | Total loss | Autosave + restorable snapshot + signal | Draft snapshot, restore banner |
-| Non-Destructive Safety | Action safety | Immediate destructive | Undo + progressive confirmation | Time-buffer undo, soft delete |
-| Feedback Timing | Temporal clarity | Opaque delay | Immediate + resolved state clarity | Optimistic UI, contextual loaders |
-| Interactive Load | Action density | >12 at once | ≤7 primary visible; clear hierarchy | Grouping, de-prioritized secondary set |
-| Sensory Stability | Visual calmness | Reflows / flashing | Layout stability + smooth transitions | Honors prefers-reduced-motion |
-| Change Transparency | Understanding impact | Black box | Clear delta summary post-action | Structured change recap |
-| Cumulative Executive Load | Overall cognitive cost | Fragmented / erratic | Segmented with milestone anchors | Graduated checkpoints |
-
-## Specific Metrics
+Métriques clés:
 | Metric | Description | Format |
 |--------|-------------|--------|
-| Interactive Density | # visible interactive controls per step | Number + classification (Primary/Secondary/Tertiary) |
-| Recovery Latency | Steps or seconds required to resume after simulated interruption | Numeric |
-| Context Stability Index | (Non-disruptive transitions / total transitions) | 0–1 |
-| Undo Coverage | % destructive actions with recovery path | Percentage |
-| Offload Surface Count | # surfaces that replace memory reliance (recap, hints, persistent panels) | Count |
-| Persona Impact Weight | Weighting ASC / ADHD friction severity | 1–3 |
+| InteractiveDensity | # contrôles visibles / step (P/S/T) | Nombre + classes |
+| RecoveryLatency | Steps ou s pour reprise | Num |
+| ContextStability | non-disruptive / total transitions | 0–1 |
+| UndoCoverage | % actions destructives réversibles | % |
+| OffloadSurfaces | Surfaces récap / hints / panels | Count |
+| PersonaWeight | Pondération friction (ASC/ADHD) | 1–3 |
 
-## Method
-1. Map steps (triggers + transitions).
-2. Count density (≤7 target; >10 = potential overload).
-3. Identify risk events (loss, destructive, ambiguity).
-4. Capture recovery vectors (undo, autosave, restore, safe re-entry).
-5. Annotate friction per persona (ASC, ADHD, Hybrid).
-6. Record sensory signals (motion, reflow, abrupt disappearance).
-7. Apply scoring (0–5) + persona weighting for severe friction.
-8. Generate cognitive heatmap.
+Méthode condensée: cartographier steps → compter densité → relever événements risque (perte progrès / destructif) → inventorier recovery (undo, autosave) → noter friction persona par step → noter signaux sensoriels → scorer 0–5 (max aggravant) → produire heatmap & tableau recommandations.
 
-## Persona Signals — Normalized Examples
-| Signal | ASC Importance | ADHD Importance |
-|--------|----------------|-----------------|
-| Persistent progress anchors | Critical | Helpful |
-| Collapsing non-essential sections | Helpful | Critical |
-| Undo buffer for destructive actions | Helpful | Critical |
-| Lateral auto-recap panel | Helpful | Critical |
-| Announced state transition | Critical | Helpful |
-| Focus mode (reduced distractions) | Helpful | Critical |
-| Contextual delayed feedback explanation | Helpful | Critical |
-| Predictable element ordering | Critical | Helpful |
+JSON / Tableaux attendus (ordre de sortie fixe):
+1 Flows Analysés  
+2 Step Maps (| Flow | Step | Trigger | State | Density P/S/T | Notes |)  
+3 Metrics Table  
+4 Persona Friction Matrix (| Flow | Step | Persona | Friction | Mitigation? | Gap | Ref |)  
+5 Cognitive Risk Register (| Flow | Step | Risk Type | Description | Severity | Mitigation | Gap | Ref |)  
+6 Recovery & Safety Net (| Mechanism | Present? | Coverage | Notes |)  
+7 Heatmap (| Step | Orientation | Predictability | Focus | Recovery | Load | Mean |)  
+8 Scores Summary (| Flow | Orientation | Predictability | MemoryRelief | Focus | Recovery | Safety | Feedback | ExecLoad | Overall |)  
+9 Recommendations (| Priority | Recommendation | Dimensions | Persona Impact | Evidence Ref | Expected Gain |)  
+10 Appendix (Method).
 
-## Output — Sections (Order Required)
-1. Flows Analyzed
-2. Step Maps
-3. Cognitive Metrics Table
-4. Persona Friction Matrix
-5. Cognitive Risk Register
-6. Recovery & Safety Net Inventory
-7. Heatmap (Step vs Dimensions)
-8. Scores Summary (with weighting)
-9. Recommendations (prioritized + evidence)
-10. Appendix (Method & Definitions)
+Scoring (0–5) repères rapides:
+- 0 absent/antinomique, 3 baseline fonctionnel, 5 exemplaire
+- InteractiveDensity: ≤7 contrôles primaires ok; >10 = surcharge (flag ⚠)
+- ContextStability <0.7 = risque Predictability
+- UndoCoverage <0.6 sur actions destructives = High Safety risk
 
-### Step Maps
-| Flow | Step | Trigger | View State | Interactive Density (P/S/T) | Notes |
+Pondérations suggérées (si agrégat global): Recovery x1.3, FocusControl x1.2, Predictability x1.2 (flux ASC critiques).
 
-### Cognitive Metrics Table
-| Flow | Metric | Value | Target | Deviation | Commentary |
+Recommandations: lier chaque ligne à Evidence Ref (fichier:ligne ou observation). Mentionner "No significant friction observed" si aucune friction persona sur un step.
 
-### Persona Friction Matrix
-| Flow | Step | Persona | Friction (Literal) | Mitigation Present? | Gap | Ref |
+Contraintes:
+- Rendre tables même vides (indiquer (empty))
+- Pas de spéculation sans signal observé
+- Justifier chaque score >=4 ou <=1 par note succincte
+- Marquer >10 contrôles visibles par ⚠ dans Heatmap
 
-### Cognitive Risk Register
-| Flow | Step | Risk Type | Description | Severity (L/M/H) | Current Mitigation | Gap | Ref |
+Acceptation:
+1 ≥2 flows  
+2 Chaque persona a friction ou absence explicite  
+3 Toutes tables & heatmap présentes  
+4 Scores traçables à signaux / metrics  
+5 Recos référencent au moins un risque / evidence  
+6 UndoCoverage & ContextStability calculés si données suffisantes  
 
-### Recovery & Safety Net Inventory
-| Mechanism | Present? | Coverage | Notes |
+Exemples bullets exécutif:
+- Checkout: Density 11 ⚠ → surcharge focus (ADHD)
+- Création: Absence autosave → reprise manuelle (Recovery High)
+- Transitions modales non annoncées (Predictability Medium)
 
-### Heatmap (Example)
-| Step | Orientation | Predictability | Focus | Recovery | Interactive Load | Mean Score |
-(Use 0–5; mark >10 interactive controls as ⚠)
-
-### Scores Summary (0–5)
-| Flow | Orientation | Predictability | Memory Relief | Focus | Recovery | Non-Destructive | Feedback | Stability | Exec Load | Overall (Weighted) |
-
-Suggested weighting (adjustable):
-- Recovery: x1.3
-- Focus: x1.2
-- Predictability (for ASC-heavy flows): x1.2
-
-### Recommendations
-Format:
-| Priority | Recommendation | Dimension(s) | Persona Impact | Evidence Ref | Expected Gain |
-
-Rules:
-- No speculation: tie each recommendation to observed signal.
-- If no friction for persona in a step: explicitly state “No significant friction observed”.
-- If a table is empty: still render it + mark “(empty)”.
-
-## Acceptance Criteria
-- ≥2 flows audited.
-- Each persona has ≥1 friction OR explicit absence statement.
-- All tables present (even if empty).
-- Scores justified by cited signals.
-- No invented mitigation lacking observation.
-
-## Scoring Guide
-| Score | Description |
-|-------|-------------|
-| 0 | Absent / Antithetical |
-| 1 | Very insufficient |
-| 2 | Partial / Fragile |
-| 3 | Functional baseline |
-| 4 | Solid with minor gaps |
-| 5 | Exemplary / Model state |
+Fin prompt.

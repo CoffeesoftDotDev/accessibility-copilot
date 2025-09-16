@@ -1,62 +1,69 @@
 ---
 mode: 'agent'
-description: 'Static code semantic & structural accessibility audit with neuro-inclusive focus'
-tools: ['usages', 'problems', 'fetch', 'codebase', 'todos']
-outputs: ['issues','diffPlan']
+description: 'Audit statique accessibilité & support cognitif (version courte)'
+tools: ['codebase','usages','problems','fetch','todos']
+outputs: ['issues']
 ---
-# Static Code Accessibility & Cognitive Support Audit
+# Static Code Audit
 
-## Scope
-Analyze repository source for deviations from:
-- Semantic correctness (native first, minimal ARIA)
-- Keyboard & focus integrity (§8)
-- Layout stability & motion control (§6, §9)
-- Cognitive scaffolding hooks (step indicators, data-testid, undo infra) (§2, §17, §18)
+Objectif: Identifier rapidement les écarts structurels & cognitifs côté code (sémantique, focus, stabilité, réduction charge mentale) et générer une table de recommandations priorisées.
 
-## Extraction Targets
-Scan and catalog:
-1. Landmark usage counts per page/layout file
-2. Multiple `<main>` occurrences
-3. Presence / absence of skip link anchor
-4. Elements with `tabindex` > 0
-5. Custom components wrapping interactive roles (e.g., div[role="button"]) vs native
-6. ARIA attributes used; flag suspicious (role="presentation" wrapping interactive, redundant aria-label)
-7. Instances of placeholder-only forms (input without <label>)
-8. Buttons/links with ambiguous text (Go, Here, Click, Do it)
-9. Potential layout shift sources (images without width/height / aspect ratio)
-10. Motion sources: CSS keyframes > 150ms or repeated infinite animations
-11. Missing reduced motion handling (search for `prefers-reduced-motion`)
-12. Undo / draft infrastructure (search for undo, restore, draft, autosave)
-13. Notification pattern (search toast, snackbar, alert) and persistence
+Personae (impact colonne Impact): TSA = besoin de structure stable; ADHD = clarté focus & libellés; HYB = combinaison.
 
-## Output Format
-Return JSON-like fenced block plus human summary:
+Entrées implicites: analyser sources fournis (extensions .vue/.tsx/.js/.html/.css). Pas de modification de code; seulement analyse.
+
+Extraction JSON attendue (ordre de clés fixe):
 ```
 {
-  "landmarks": {"layoutsChecked": N, "multipleMain": [...paths]},
-  "skipLink": {"present": bool, "pathsMissing": [...]},
-  "focus": {"positiveTabindex": [...paths]},
-  "semantics": {"divRoleButton": [...], "ariaSuspicious": [...]},
-  "forms": {"missingLabel": [...]},
-  "copy": {"ambiguousLabels": [...]},
-  "layout": {"unreservedMedia": [...]},
-  "motion": {"infiniteAnimations": [...], "noReducedMotionRefs": bool},
-  "recovery": {"undoHooks": [...], "autosave": [...]},
-  "notifications": {"ephemeralOnlyCandidates": [...]} 
+  "landmarks": {"layoutsChecked":0,"multipleMain":[]},
+  "skipLink": {"present":false,"pathsMissing":[]},
+  "focus": {"positiveTabindex":[]},
+  "semantics": {"divRoleButton":[],"ariaSuspicious":[]},
+  "forms": {"missingLabel":[]},
+  "copy": {"ambiguousLabels":[]},
+  "layout": {"unreservedMedia":[]},
+  "motion": {"infiniteAnimations":[],"noReducedMotionRefs":true},
+  "recovery": {"undoHooks":[],"autosave":[]},
+  "notifications": {"ephemeralOnlyCandidates":[]}
 }
 ```
 
-Then a Recommendations section:
+Cibles d’extraction (résumé numéroté):
+1 landmarks par fichier & multi-<main>
+2 skip link présent ?
+3 tabindex > 0
+4 wrappers non natifs (div[role=button], span.click)
+5 ARIA suspects (presentation sur interactif, aria-label redondant)
+6 inputs sans label
+7 libellés ambigus (Go|Here|Click|Do it)
+8 médias sans width/height (risque CLS)
+9 animations >150ms ou infinite
+10 absence de prefers-reduced-motion
+11 hooks undo/draft/autosave
+12 notifications éphémères seulement
+
+Table Recommandations (après le bloc JSON):
 | Issue | Impact (TSA/ADHD) | Fix Pattern | Ref |
-|-------|-------------------|------------|-----|
-| Missing skip link | Disorientation | Add first-focus anchor + visible on focus | §6, §8 |
+|-------|-------------------|-------------|-----|
+| Missing skip link | Orientation / focus drift | Ajouter ancre skip + visibilité focus | §6 §8 |
+| Multiple <main> | Structure ambiguë | 1 seul <main> + landmarks secondaires | §6 §10 |
+| Ambiguous button text | Contexte mémoriel perdu | Remplacer par libellé action explicite | §7 |
+| Images sans dimensions | Reorientation coût | Ajouter width/height ou aspect-ratio | §6 |
+| Infinite animation >150ms | Charge sensorielle | Préférence reduced-motion + réduire durée | §9 |
 
-## Constraints
-- Do not modify code—analysis only.
-- Deterministic key ordering in JSON.
-- Only list confirmed occurrences (no guesses).
+Critères & Contraintes:
+- JSON valide, clés dans l’ordre listé
+- Uniquement occurrences confirmées (pas d’inférence)
+- Liste ambiguousLabels dédupliquée
+- Chaque Fix Pattern réfère ≥1 section (§6–§10 etc.)
+- Pas de code exact (pattern descriptif)
 
-## Acceptance Criteria
-- All extraction targets addressed.
-- Each recommendation maps to spec section(s).
-- Ambiguous label list de-duplicated.
+Acceptation (succinct):
+1 Tous champs JSON présents (même vides)
+2 Chaque cible listée couverte dans JSON ou tableau
+3 Aucune clé supplémentaire non décrite
+4 Recommandations ont Impact & Ref
+5 Pas de doublon dans ambiguousLabels
+6 Absence d’animations lourdes signalée si aucune trouvée (noReducedMotionRefs true)
+
+Fin prompt court.
