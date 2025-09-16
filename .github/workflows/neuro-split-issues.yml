@@ -54,8 +54,15 @@ jobs:
           # Exécute le modèle
           printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
           cat issues.json
-          echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
+          # echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_OUTPUT"
+          if jq -e '.issues' model_output.json > /dev/null; then
+            issues=$(jq -c '.issues' model_output.json)
+            echo "issues=$issues" >> "$GITHUB_OUTPUT"
+          else
+            echo "No valid 'issues' array found in model output."
+            echo "issues=[]" >> "$GITHUB_OUTPUT"
+          fi
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
           CONTENT: ${{ steps.pr_report_details.outputs.report }}
