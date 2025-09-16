@@ -18,11 +18,6 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-      - name: Cancel workflow if PR is from copilot agent
-        if: startsWith(context.payload.sender.login, 'Copilot')
-        run: |
-          echo "Pull request is from copilot agent. Exiting workflow."
-          exit 0
       - name: Create Issue for PR
         uses: actions/github-script@v8
         with:
