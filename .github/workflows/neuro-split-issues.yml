@@ -50,7 +50,10 @@ jobs:
         id: gen_issues
         run: |-
           CONTENT="${{ steps.pr_report_details.outputs.report }}"
-          ISSUES_TO_CREATE=$(gh models generate-issue --content "$CONTENT")
+          ISSUES_TO_CREATE=$(gh models run --file $PROMPTS_FILE --var input="$CONTENT")
+          echo "issues to create : $ISSUES_TO_CREATE"
           echo "issues=$ISSUES_TO_CREATE" >> "$GITHUB_OUTPUT"
+        env:
+          PROMPTS_FILE: "prompts/issue-summary.prompt.yml"
         
 
