@@ -61,7 +61,7 @@ jobs:
           EOF
           
           # Récupère le contenu (JSON une ligne) produit par le step précédent
-          #CONTENT='${{ steps.pr_report_details.outputs.report }}'
+          # CONTENT='${{ steps.pr_report_details.outputs.report }}'
 
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
