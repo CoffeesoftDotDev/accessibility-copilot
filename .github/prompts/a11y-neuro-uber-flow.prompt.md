@@ -9,6 +9,66 @@ outputs: ['overviewReport','staticCodeFindings','contentFindings','flowReport','
 ## Purpose
 Provide an end‑to‑end consolidated audit that sequences: Overview → Static Code → Content & Microcopy → Cognitive Multi‑Step Flows → Synthesis & Risk → Action & Metrics. Leverages and embeds the existing specialized prompts (overview, static code, content, cognitive flow) into a single deterministic output for executive + implementation consumption.
 
+
+### Spec Reference Index (Anchor for §6–§23)
+| Section | Theme (Concise) | Notes |
+|---------|-----------------|-------|
+| §6 | Structural & Predictability Foundations | Landmarks, spatial stability, reserved space |
+| §7 | Copy & Label Clarity | Naming, icon textual alternatives |
+| §8 | Keyboard & Focus Mechanics | Operability, traps, order, initial focus |
+| §9 | Motion & Sensory Modulation | prefers-reduced-motion, intensity gating |
+| §10 | Semantic Integrity | Native elements, ARIA correctness |
+| §11 | State & Feedback Continuity | Status roles, live regions |
+| §12 | Recovery & Reversibility | Undo, drafts, soft deletes |
+| §13 | Error Communication | Persistent, actionable, mapped fields |
+| §14 | Progressive Disclosure | Chunking, section scoping |
+| §15 | Working Memory Offload | Recaps, summaries, anchored indices |
+| §16 | Cognitive Load Reduction | Grouping, format consistency |
+| §17 | Flow Stability & Transitions | Step boundaries, handoff predictability |
+| §18 | Notification Persistence & Accessibility | Durable vs ephemeral signals |
+| §19 | Personalization & Preferences | Mode toggles (focus, reduced stimuli) |
+| §20 | Data Density & Legibility | Spacing, contrast triggers |
+| §21 | Instrumentation & Metrics | Telemetry mapping & gaps |
+| §22 | Critical Anti‑Patterns | Blocking violations (e.g., keyboard traps) |
+| §23 | Governance & Exception Handling | Deferred mitigation logging |
+
+### Optional Configuration Inputs (Advanced)
+Add any of these (optional) after Required Inputs to control output:
+```
+OUTPUT_FORMAT: markdown|json|hybrid (default: markdown)
+MAX_EXEC_SUMMARY_BULLETS: <int> (default: 10)
+INCLUDE_GOVERNANCE: true|false (default: true)
+INCLUDE_CHANGE_IMPACT: true|false (default: true)
+MIN_METRIC_GAP_COUNT: <int> (default: 3)
+RISK_AGGREGATE_WEIGHTS: {"High":1.0,"Medium":0.6,"Low":0.3} (override accepted)
+RISK_AGGREGATE_THRESHOLDS: {"High":>=0.75,"Medium":>=0.45,"Low":>=0.15}
+SKIP_EMPTY_SECTIONS: true|false (default: false)
+INCLUDE_FOOTER_DISCLAIMER: true|false (default: true)
+OMIT_DIMENSIONS: ["InteractiveDensity"] (optional array to treat as informational only)
+MERGE_EVIDENCE_MAX_LEN: 400 (truncate evidence concatenation beyond)
+ACTION_EFFORT_SCALE: XS|S|M|L|XL (default set applied)
+```
+
+If `OUTPUT_FORMAT=json` produce ONLY a final JSON object conforming to `UnifiedAuditJSON` schema (see below). If `hybrid`, produce normal markdown THEN append a JSON block.
+
+### UnifiedAuditJSON (Minimal Schema for Automation)
+```
+{
+  "meta": {"date":"<DATE_AS_OF>","targetScope":"...","personas":["TSA","ADHD"],"config":{ /* applied overrides */ }},
+  "summary": {"highRiskCount": <int>, "mediumRiskCount": <int>, "lowRiskCount": <int>, "topDimensions": ["Keyboard","Recovery"]},
+  "risks": [ {"id":"Keyboard-cart-icon-1","dimension":"Keyboard","severity":"High","evidence":"...","recommendation":"...","refs":["§8"],"personas":["TSA","ADHD"]} ],
+  "actionPlan": [ {"priority":"P1","action":"Add dialog semantics","riskIds":["Semantics-dialogs-1"],"effort":"M"} ],
+  "metricsGaps": [ {"signal":"undo_action","present":false,"priority":"High"} ],
+  "governance": [ {"component":"Checkout","ruleRelaxed":"Autosave immediate","justification":"Security review pending"} ],
+  "method": {"dataSources":["static-code","content"],"normalization":"severity escalate highest","version":"1.1"}
+}
+```
+Keys must remain deterministically ordered (as shown) unless adding new optional top-level fields after `method`.
+
+### Risk Aggregate Formula (Optional Explanation)
+If included, compute per-dimension aggregate score:
+`score = (HighCount * wHigh + MediumCount * wMedium + LowCount * wLow) / (IssueCount * wHigh)` with default weights (1.0, 0.6, 0.3). Classify via thresholds in config. Report in Risk Matrix as supplemental column only if `OUTPUT_FORMAT` not strictly `json`.
+
 ## When To Use
 Use this mega prompt when you need a holistic maturity snapshot and prioritized roadmap in ONE run instead of invoking four separate audits. Suitable for pre‑release readiness, quarterly baseline, or large refactor validation.
 

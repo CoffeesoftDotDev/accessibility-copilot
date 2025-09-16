@@ -45,6 +45,33 @@ Central hub for agent prompts supporting TSA / ADHD focused accessibility & cogn
 | §21 Metrics | Signal availability | Architecture & Metrics |
 | §22 Anti-Patterns | Immediate blockers | All (esp. Static Code / Overview) |
 
+## 5b. Full Spec Reference Index (Anchor §§6–§23)
+
+Internal taxonomy used across all prompts (e.g., risk objects `risks.refs:["§8","§12"]`). This is not an official external standard; it consolidates WCAG, ARIA, and neuro‑inclusive heuristics (predictability, cognitive load reduction, reversibility). Do not renumber without a coordinated migration.
+
+| Section | Theme (Concise) | Purpose Summary |
+|---------|-----------------|-----------------|
+| §6 | Structural & Predictability Foundations | Landmarks, spatial stability, reserved space |
+| §7 | Copy & Label Clarity | Explicit labels, icon textual alternatives |
+| §8 | Keyboard & Focus Mechanics | Operability, order, visible focus, no traps |
+| §9 | Motion & Sensory Modulation | Moderate animations, respect prefers-reduced-motion |
+| §10 | Semantic Integrity | Native HTML, correct roles/ARIA |
+| §11 | State & Feedback Continuity | Persistent state announcements (live/status) |
+| §12 | Recovery & Reversibility | Undo, drafts, soft delete safety nets |
+| §13 | Error Communication | Field-linked, persistent, actionable errors |
+| §14 | Progressive Disclosure | Gradual reveal / chunking for complexity control |
+| §15 | Working Memory Offload | Recaps, anchored indices, structured summaries |
+| §16 | Cognitive Load Reduction | Consistent grouping, stable formats |
+| §17 | Flow Stability & Transitions | Predictable step boundaries & focus transitions |
+| §18 | Notification Persistence & Accessibility | Differentiate ephemeral vs durable messages |
+| §19 | Personalization & Preferences | User toggles (focus mode, reduced stimuli) |
+| §20 | Data Density & Legibility | Spacing, readability, density balance |
+| §21 | Instrumentation & Metrics | Usage / recovery event capture |
+| §22 | Critical Anti‑Patterns | Immediate blockers (e.g., keyboard trap) |
+| §23 | Governance & Exception Handling | Exception log & deferral tracking |
+
+Note: Use these identifiers in every report for grouping, metrics, and governance traceability.
+
 ## 6. Persona Integration Expectations
 All prompts reference persona friction either directly (Cognitive Flow) or via risk commentary (Overview). When running *any* audit:
 - Choose at least 2 personas (TSA Analytical + ADHD Creative minimum).
