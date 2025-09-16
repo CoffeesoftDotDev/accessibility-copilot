@@ -57,3 +57,27 @@ jobs:
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
           CONTENT: ${{ steps.pr_report_details.outputs.report }}
+  create_issues:
+    needs: test_action
+    if: ${{ needs.test_action.outputs.issues != '' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        issue: ${{ fromJson(needs.test_action.outputs.issues) }}
+
+    steps:
+      - name: Create GitHub Issue
+        run: |
+          title="${{ matrix.issue.title }}"
+          body="${{ matrix.issue.body }}"
+          
+          if [[ -z "$title" || -z "$body" ]]; then
+            echo "Skipping empty issue..."
+            exit 0
+          fi
+
+          echo "Creating issue: $title"
+          gh issue create --title "$title" --body "$body"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
