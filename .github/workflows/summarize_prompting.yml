@@ -2,8 +2,6 @@ name: Weekly Issue Summary
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 9 * * 1'
 
 permissions:
   issues: write
