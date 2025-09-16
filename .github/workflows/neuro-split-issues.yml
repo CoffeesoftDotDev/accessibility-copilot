@@ -27,6 +27,8 @@ jobs:
 
       - name: Echo context (debug)
         run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Get PR report details
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
