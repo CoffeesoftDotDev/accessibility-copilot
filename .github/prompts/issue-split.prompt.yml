@@ -4,29 +4,37 @@ model: openai/gpt-5
 responseFormat: json_schema
 jsonSchema: |-
   {
-    "name": "describe_multiple_animals",
+    "name": "generate_issues",
     "strict": true,
     "schema": {
       "type": "object",
-      "items": {
-        "type": "array",
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "Title of the issue"
-          },
-          "body": {
-            "type": "string",
-            "description": "Body of the issue"
-          },
-          "label": {
-            "type": "string",
-            "description": "Label for the issue"
+      "properties": {
+        "issues": {
+          "type": "array",
+          "description": "List of GitHub issues to be created",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of the issue"
+              },
+              "body": {
+                "type": "string",
+                "description": "Body of the issue"
+              },
+              "label": {
+                "type": "string",
+                "description": "Label for the issue"
+              }
+            },
+            "required": ["title", "body", "label"],
+            "additionalProperties": false
           }
-        },
-        "required": ["title", "body", "label"],
-        "additionalProperties": false
-      }
+        }
+      },
+      "required": ["issues"],
+      "additionalProperties": false
     }
   }
 messages:
