@@ -136,7 +136,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: "${issueId}",
+                issue_number: issueResult.repository.issue.number,
                 body: `🤖 execute prompts located in .github/prompts/code-a11y-review.prompt.md`
               });
 
@@ -145,7 +145,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: "${issueId}",
+                issue_number: issueResult.repository.issue.number,
                 body: `🤖 Review issue created: ${issueId}\n\n⚠️ Failed to assign to Copilot coding agent: ${error.message}`
               });
             }
