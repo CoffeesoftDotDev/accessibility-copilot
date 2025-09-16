@@ -52,7 +52,7 @@ jobs:
         run: |-
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
-          printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
+          printf '%s\n' "$CONTENT" | gh models run --json --file "$PROMPTS_FILE" > issues.json
           echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_OUTPUT"
         env:
