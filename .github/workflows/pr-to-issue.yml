@@ -23,7 +23,8 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           script: |
-            if (startsWith(context.payload.sender.login, 'Copilot')) {
+            console.log('GitHub context:', JSON.stringify(context, null, 2));
+            if (context.payload && context.payload.sender && typeof context.payload.sender.login === 'string' && context.payload.sender.login.toLowerCase().startsWith('copilot')) {
               console.log("Pull request is from copilot agent. Exiting workflow.");
               return;
             }
