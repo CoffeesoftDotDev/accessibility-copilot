@@ -43,8 +43,8 @@ jobs:
             exit 0
           fi
 
-          # Publie dans les outputs
-          echo 'report=$(gh issue view "$ISSUE_NB" --json number,title,body,url | jq -c .)' >> "$GITHUB_OUTPUT"
+          JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url | jq -c .)
+          printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
 
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
