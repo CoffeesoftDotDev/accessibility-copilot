@@ -43,14 +43,8 @@ jobs:
             exit 0
           fi
 
-            # Récupère titre + body au format JSON
-          JSON=$(gh issue view "$ISSUE_NB" --json number,title,body,url)
-
-          # Compacte en une seule ligne (retire retours)
-          JSON_ONELINE=$(echo "$JSON" | tr '\n' ' ')
-
           # Publie dans les outputs
-          echo "report=$JSON_ONELINE" >> "$GITHUB_OUTPUT"
+          echo "report=$(gh issue view \"$ISSUE_NB\" --json number,title,body,url | jq -c .)" >> "$GITHUB_OUTPUT"
 
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
@@ -59,17 +53,7 @@ jobs:
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
           printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
-
-          echo "=== Raw model output (start) ==="
-          printf '%s\n' "$(cat issues.json)"
-          echo "=== Raw model output (end) ==="
-
-          # Exporte aussi comme output du step (pour job outputs / needs.*)
-          {
-            echo 'issues<<EOF'
-            printf '%s\n' "$(cat issues.json)"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
           CONTENT: ${{ steps.pr_report_details.outputs.report }}
