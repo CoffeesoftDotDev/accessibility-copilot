@@ -1,8 +1,6 @@
 name: Issue splitter
 description: Split a report into separate issues
 model: openai/gpt-5
-modelParameters:
-  temperature: 0.6
 messages:
   - role: system
     content: |
