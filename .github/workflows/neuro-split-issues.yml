@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get Context
-        id: get-context
+        id: get_context
         run: |-
           echo "repo=${{github.event.repository.name}}" >> "GITHUB_OUTPUT"
           echo "$GITHUB_CONTEXT"
