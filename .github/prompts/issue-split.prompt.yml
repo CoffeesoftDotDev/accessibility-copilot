@@ -68,3 +68,7 @@ messages:
     content: |
       Please use the following report to detail actionable tasks :
       {{input}}
+
+      --- 
+      # Available Labels: 
+      {{labels}}
