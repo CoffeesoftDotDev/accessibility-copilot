@@ -16,19 +16,23 @@ jobs:
     outputs: 
       report: ${{ steps.pr_report_details.outputs.report }}
       issues: ${{ steps.gen_issues.outputs.issues }}
+      repo: ${{ steps.get_context.outputs.repo }}
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install gh-models extension
-        run: gh extension install https://github.com/github/gh-models
-
-      - name: Echo context (debug)
-        run: echo "$GITHUB_CONTEXT"
+      - name: Get Context
+        id: get-context
+        run: |-
+          echo "repo=${{github.event.repository.name}} >> GITHUB_OUTPUT"
+          echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - name: Install gh-models extension
+        run: gh extension install https://github.com/github/gh-models
 
       - name: Get PR report details
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
@@ -50,9 +54,12 @@ jobs:
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: gen_issues
         run: |-
+          echo "getting available labels for current repo" 
+          labels="$(gh label list --repo "$REPO" --json name,description)"
+          
           echo "Running model with prompt file: $PROMPTS_FILE"
           # Exécute le modèle
-          printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" > issues.json
+          printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" --var labels="$labels"> issues.json
           cat issues.json
           # echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_OUTPUT"
@@ -66,6 +73,7 @@ jobs:
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
           CONTENT: ${{ steps.pr_report_details.outputs.report }}
+          REPO: ${{ steps.get_context.outputs.repo }}
   create_issues:
     needs: test_action
     if: ${{ needs.test_action.outputs.issues != '' }}
@@ -80,11 +88,14 @@ jobs:
         run: |
           echo "Raw ISSUE input:"
           echo "$ISSUE"
+          echo "Repo Name :"
+          echo "$REPO"
       
           # Extract fields safely
           title="$(echo "$ISSUE" | jq -r '.title')"
           body="$(echo "$ISSUE" | jq -r '.body')"
           label="$(echo "$ISSUE" | jq -r '.label')"
+          repo="$(echo "$REPO")"
       
           # Defensive checks
           if [[ -z "$title" || -z "$body" ]]; then
@@ -99,7 +110,9 @@ jobs:
           gh issue create \
             --title "$title" \
             --body "$body" \
-            --label "$label"
+            --label "$label" \
+            --repo "$repo"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ toJson(matrix.issue) }}
+          REPO: ${{ needs.test_action.outputs.repo }}
