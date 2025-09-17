@@ -111,6 +111,6 @@ jobs:
             --repo "$repo" \
             --assignee "@copilot"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
           ISSUE: ${{ toJson(matrix.issue) }}
           REPO: ${{ needs.test_action.outputs.repo }}
