@@ -86,43 +86,65 @@ Gravité normalisée: High (bloquant / critique persona), Medium (friction maté
 La sortie FINALE DOIT être exclusivement en Markdown (aucun bloc JSON). 
 Si une section n’a aucun contenu pertinent, afficher `None Found`.
 
-###  contenue de la sortie : Backlog & Issue Cards
-Table synthèse:
+### Contenu de la sortie : Backlog & Issue Cards
+
+Objectif: Générer (section J uniquement) un backlog priorisé des risques a11y / neuro-cognitifs sous forme:
+1. Tableau synthèse (toutes les issues, P1 d'abord)
+2. Cartes détaillées (une par issue, dans le même ordre)
+
+Règles générales:
+- Aucun texte avant le titre `### Backlog & Issue Cards` dans la sortie finale.
+- Pas de JSON; Markdown pur.
+- Si 0 risque: produire le tableau avec la ligne neutre (cf. cas vide) et aucune carte.
+- Les colonnes ne doivent pas être réordonnées; alignement libre Markdown.
+- `Why` ≤ 18 mots (compter mots séparés par espaces).
+- `Acceptance (condensée)` = liste compacte de livrables (séparés par `;`).
+- Effort échelle: XS, S, M, L, XL.
+- Priority: P1 (critique) > P2 > P3.
+- Personas: liste codes (ex: `TSA, ADHD`).
+
+Tableau synthèse (en-têtes EXACTS):
 | Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
-Issue Key: A11Y-n (P1 d’abord). Puis cartes markdown :
+
+Numérotation:
+- `Issue Key` = `A11Y-<n>` en commençant à 1, trié par Priority puis ordre d'apparition des risques sources.
+
+Construction des champs:
+- Title: verbe à l'infinitif ou substantif action clair (FR) ≤ 60 caractères.
+- Risk IDs: concaténés par `; `, tri stable.
+- Why: cause + impact succinct (pas d'adjectifs vagues type "important").
+- Acceptance (condensée): suite de critères atomiques (pas de conjonctions longues) ex: `Focus trap; ESC ferme; Retour focus bouton déclencheur`.
+
+Template carte (utiliser tiret cadratin « – » après l'Issue Key):
 ```
-#### Issue: A11Y-1 – <Titre>
-Linked Risks: <IDs>
-Priority: P1 | Effort: S | Personas: TSA, ADHD
-Problem: <fichier:ligne résumé>
-###  Backlog & Issue Cards
-Le backlog liste les issues à créer dans le système de suivi (GitHub Issues, Jira, etc.) pour adresser les risques identifiés. Chaque issue est priorisée et catégorisée par persona.
-Table synthèse:
-| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
-Issue Key: A11Y-n (P1 d’abord). Puis cartes markdown :
-```
-#### Issue: A11Y-1 – <Titre>
-Linked Risks: <IDs>
-Priority: P1 | Effort: S | Personas: TSA, ADHD
-Problem: <fichier:ligne résumé>
+#### Issue: A11Y-<n> – <Title>
+Linked Risks: <Risk IDs>
+Priority: P<1|2|3> | Effort: <XS|S|M|L|XL> | Personas: <codes>
+Problem: <fichier[:ligne] bref résumé contexte>
 Why: <≤18 mots>
 Acceptance:
 - [ ] Critère 1
 - [ ] Critère 2
-Telemetry: <signal ou N/A>
+Telemetry: <eventName ou N/A>
 ```
 
-Carte issue (markdown):
+Exemple minimal (illustratif):
 ```
-#### Issue: A11Y-1 – Rendre icône panier focusable
-Linked Risks: Keyboard-cart-icon-1
+### Backlog & Issue Cards
+| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
+| A11Y-1 | Rendre icône panier accessible clavier & SR | Keyboard-cart-icon-1; Semantics-cart-icon-2 | P1 | S | TSA, ADHD | Icône non focusable désoriente navigation | Bouton rôle+aria-label; Focus visible; Enter/Space actifs |
+
+#### Issue: A11Y-1 – Rendre icône panier accessible clavier & SR
+Linked Risks: Keyboard-cart-icon-1; Semantics-cart-icon-2
 Priority: P1 | Effort: S | Personas: TSA, ADHD
-Problem: Focus perdu après ajout panier (CatalogGrid.vue:42–58).
-Why: Perte d’orientation augmente charge cognitive.
+Problem: CartIcon.vue: div clickable sans role ni tabindex
+Why: Absence focusable element casse repères utilisateurs clavier
 Acceptance:
-- [ ] Bouton natif avec aria-label dynamique
-- [ ] Enter & Space togglent le panier
-Telemetry: add_to_cart
+- [ ] Wrapper remplacé par `<button>` natif
+- [ ] `aria-label` dynamique avec nombre articles
+- [ ] Enter & Space déclenchent `toggleCart`
+- [ ] Anneau focus contraste ≥3:1
+Telemetry: cart_open
 ```
 
 ## Sortie Attendue (Rappel)
