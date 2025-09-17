@@ -16,7 +16,10 @@ Séquence d’exécution recommandée (stop-on-error=false, agréger résultats 
 4. Overview: `a11y-neuro-audit-overview.prompt.md` → synthèse haut niveau & matrices.
 5. Fusion: appliquer Algorithme fusion (ci‑dessous) pour produire UnifiedAuditJSON + tableaux Action Plan & Backlog.
 
-Chaque sous-prompt conserve son ordre de clés interne; ce méta prompt impose ensuite l’ordre A→J défini plus bas.
+Chaque sous-prompt conserve son ordre de clés interne; ce méta prompt impose ensuite l’ordre d'éxécution A→J défini ci-dessous:
+
+Phases (succinct): A Inputs → B Overview → C Static Code → D Content → E Flows → F Synthèse & Risk Matrix → G Action Plan → H Metrics Gaps → I Governance → J Executive + Backlog.
+
 
 ### Contrat d’agrégation
 - Entrées minimales propagées à chaque sous‑prompt: TARGET_SCOPE, TECH_STACK, PRIMARY_FLOWS, PERSONAS, DATE_AS_OF.
@@ -49,8 +52,12 @@ Si un sous-prompt échoue → marquer section correspondante dans Snapshot Couve
 
 ---
 
-Objectif: Produire en une seule passe une vision des risques neuro‑cognitifs et d’accessibilité structurelle + plan d’action priorisé + backlog d’issues.
+## Informations complémentaires
 
+### Objectif de l'analyse
+Produire en une seule passe une vision des risques neuro‑cognitifs et d’accessibilité structurelle + plan d’action priorisé + backlog d’issues.
+
+### Personas et type de neuro-atypie
 Personae intégrées (abréviations à réutiliser partout):
 | Code | Persona | Besoin clé | Sensibilité principale |
 |------|---------|-----------|------------------------|
@@ -58,7 +65,9 @@ Personae intégrées (abréviations à réutiliser partout):
 | ADHD | ADHD Creative | Orientation, réduction friction | Fragmentation attention, mémoire de travail |
 | HYB  | Hybrid | Mix des deux | Stabilité + signal clair |
 
-Entrées requises (exemple inline):
+
+### Entrée utilisateurs:
+L'utilisateur peut préciser les paramètre suivants. Ces paramètres ne sont pas obligatoire mais s'ils sont fournis tu DOIS ABSOLUMENT les utiliser.
 ```
 TARGET_SCOPE: src/, https://app.prod
 TECH_STACK: Vue 3 + Vite + Tailwind
@@ -69,9 +78,13 @@ DATE_AS_OF: 2025-09-16
 OUTPUT_FORMAT: markdown
 ```
 
+### Données de référentiel
+
 Dimensions (clé courte -> intention): Predictability, CognitiveLoad, Recovery, Semantics, Keyboard, Sensory, Feedback, WorkingMemory, InteractiveDensity, CopyClarity, RiskAggregate.
 
 Gravité normalisée: High (bloquant / critique persona), Medium (friction matérielle), Low (optimisation).
+
+## Format de sortie
 
 Schéma UnifiedAuditJSON minimal (ordre stable):
 ```
@@ -85,8 +98,6 @@ Schéma UnifiedAuditJSON minimal (ordre stable):
   "method": {"dataSources":["static-code","content"],"normalization":"max-severity","version":"1.2"}
 }
 ```
-
-Phases (succinct): A Inputs → B Overview → C Static Code → D Content → E Flows → F Synthèse & Risk Matrix → G Action Plan → H Metrics Gaps → I Governance → J Executive + Backlog.
 
 Snapshot Couverture:
 | Aire | Statut | Note | Scope Summary |
