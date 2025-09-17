@@ -1,6 +1,5 @@
 .venv/
 .env
-**/build
 
 # Python bytecode and caches
 __pycache__/
