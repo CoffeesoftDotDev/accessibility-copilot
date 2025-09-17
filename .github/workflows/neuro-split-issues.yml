@@ -52,7 +52,7 @@ jobs:
           JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
           printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
       - name: Generate Issue Descriptions
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
         id: gen_issues
         run: |-
           echo "getting available labels for current repo" 
