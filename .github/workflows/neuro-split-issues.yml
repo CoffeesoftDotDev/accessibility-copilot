@@ -15,7 +15,7 @@ jobs:
   test_action:
     runs-on: ubuntu-latest
     outputs: 
-      report: ${{ steps.pr_report_details.outputs.report }}
+      reports: ${{ steps.pr_report_details.outputs.reports }}
       issues: ${{ steps.gen_issues.outputs.issues }}
       repo: ${{ steps.get_context.outputs.repo }}
     env:
@@ -39,62 +39,136 @@ jobs:
         if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
         id: pr_report_details
         run: |-
-          # Déterminer le numéro (PR review event vs issue event)
+          set -euo pipefail
           ISSUE_NB="${{ github.event.pull_request.number || github.event.issue.number }}"
           if [ -z "$ISSUE_NB" ]; then
-            echo "Aucun numéro d'issue/PR détecté dans ce type d'événement."
-            echo "report={}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Getting reports/*.md content from the neurodiversity-check PR 
-          gh pr checkout "$ISSUE_NB"
-          
-          # Concat (attention si aucun fichier)
-          shopt -s nullglob
-          files=(reports/*.md)
-          if (( ${#files[@]} == 0 )); then
+            echo "Aucun numéro d'issue/PR détecté."
             {
-              echo 'report<<EOF'
-              echo "(Aucun fichier reports/*.md trouvé)"
+              echo 'reports<<EOF'
+              echo '[]'
               echo 'EOF'
             } >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
-          concat=$(for f in "${files[@]}"; do echo "/* REPORT: $f */"; cat "$f"; echo; done)
-          
-          # Sortie multi-ligne correcte
+
+            # Checkout PR head
+          gh pr checkout "$ISSUE_NB"
+
+          shopt -s nullglob
+          files=(reports/*.md)
+          if (( ${#files[@]} == 0 )); then
+            {
+              echo 'reports<<EOF'
+              echo '[]'
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          tmp=()
+          for f in "${files[@]}"; do
+            content=$(jq -R -s '.' < "$f")   # JSON string
+            tmp+=( "$content" )
+          done
+          reports="[$(IFS=,; echo "${tmp[*]}")]"
           {
-            echo 'report<<EOF'
-            printf '%s\n' "$concat"
+            echo 'reports<<EOF'
+            echo "$reports"
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
-          
+
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
         id: gen_issues
-        run: |-
-          echo "getting available labels for current repo" 
-          labels="$(gh label list --repo "$REPO" --json name,description)"
-          
-          echo "Running model with prompt file: $PROMPTS_FILE"
-          # Exécute le modèle
-          printf '%s\n' "$CONTENT" | gh models run --file "$PROMPTS_FILE" --var labels="$labels"> issues.json
-          cat issues.json
-          # echo "issues=$(cat issues.json | jq -c .)" >> "$GITHUB_OUTPUT"
-          echo "$GITHUB_OUTPUT"
-          if jq -e '.issues' issues.json > /dev/null; then
-            issues=$(jq -c '.issues' issues.json)
-            echo "issues=$issues" >> "$GITHUB_OUTPUT"
-          else
-            echo "No valid 'issues' array found in model output."
-            echo "issues=[]" >> "$GITHUB_OUTPUT"
-          fi
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
-          CONTENT: ${{ steps.pr_report_details.outputs.report }}
           REPO: ${{ steps.get_context.outputs.repo }}
+          REPORTS: ${{ steps.pr_report_details.outputs.reports }}
+        run: |-
+          set -euo pipefail
+
+          : "${REPORTS:?Missing REPORTS (reports JSON array)}"
+          : "${PROMPTS_FILE:?Missing PROMPTS_FILE}"
+          : "${REPO:?Missing REPO}"
+
+          echo "Collecting repo labels..."
+          labels="$(gh label list --repo "$REPO" --json name,description || echo '[]')"
+
+          # Validation du format: tableau de chaînes
+            jq -e 'type=="array" and all(.[]; type=="string")' <<<"$REPORTS" >/dev/null || {
+            echo "REPORTS doit être un tableau JSON de chaînes."
+            {
+              echo 'issues<<EOF'
+              echo '[]'
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          issues_fragments=()
+          index=0
+
+          # Boucle sur chaque markdown (protégé via base64)
+          while IFS= read -r b64; do
+            index=$((index+1))
+            CONTENT=$(printf '%s' "$b64" | base64 -d)
+
+            echo "---- Chunk #$index (taille: $(printf '%s' "$CONTENT" | wc -c) octets) ----"
+
+            # Appel modèle
+            if ! printf '%s' "$CONTENT" | gh models run \
+                  --file "$PROMPTS_FILE" \
+                  --var labels="$labels" > issues.json 2>model.stderr; then
+              echo "⚠️ Échec modèle (chunk #$index)"
+              sed 's/^/[stderr] /' model.stderr || true
+              continue
+            fi
+
+            echo "Sortie brute:"
+            sed 's/^/  /' issues.json
+
+            # Normalisation:
+            # - si .issues array -> garder
+            # - si .issues objet -> en array
+            # - si racine array -> supposer que c'est directement la liste d'issues
+            # - sinon -> ignorer
+            if jq -e '.issues? or (type=="array")' issues.json >/dev/null 2>&1; then
+              norm=$(jq -c '
+                if .issues? then
+                  if .issues|type=="array" then .issues
+                  elif .issues|type=="object" then [ .issues ]
+                  else []
+                  end
+                elif type=="array" then .
+                else []
+                end
+              ' issues.json)
+              if [ "$norm" != "[]" ]; then
+                issues_fragments+=( "$norm" )
+              else
+                echo "ℹ️ Aucune issue structurée trouvée dans ce chunk."
+              fi
+            else
+              echo "ℹ️ Pas de champ .issues ni array racine — ignoré."
+            fi
+
+          done < <(jq -r '.[] | @base64' <<<"$REPORTS")
+
+          # Agrégation
+          if ((${#issues_fragments[@]}==0)); then
+            merged='[]'
+          else
+            merged=$(printf '%s\n' "${issues_fragments[@]}" | jq -s 'add')
+          fi
+
+          echo "Nombre total d'issues agrégées: $(jq 'length' <<<"$merged")"
+
+          {
+            echo 'issues<<EOF'
+            echo "$merged"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
   create_issues:
     needs: test_action
     if: ${{ needs.test_action.outputs.issues != '' }}
@@ -106,40 +180,27 @@ jobs:
         issue: ${{ fromJson(needs.test_action.outputs.issues) }}
     steps:
       - name: Create GitHub Issue
-        run: |
-          echo "Raw ISSUE input:"
-          echo "$ISSUE"
-          echo "Repo Name :"
-          echo "$REPO"
-      
-          # Extract fields safely
-          title="$(echo "$ISSUE" | jq -r '.title')"
-          body="$(echo "$ISSUE" | jq -r '.body')"
-          label="$(echo "$ISSUE" | jq -r '.label')"
-          repo="$(echo "$REPO")"
-      
-          # Defensive checks
-          if [[ -z "$title" || -z "$body" ]]; then
-            echo "Skipping empty or invalid issue..."
-            exit 0
-          fi
-      
-          echo "Creating issue with title: $title"
-          echo "Label: $label"
-
-          # Authenticating GH CLI with PAT to be able to assign Copilot to work on an issue 
-          # -s project required for by https://cli.github.com/manual/gh_issue_create 
-          # echo "$PAT" | gh auth login --with-token
-      
-          # Use gh issue create with safe quoting
-          gh issue create \
-            --title "$title" \
-            --body "$body" \
-            --label "$label" \
-            --repo "$repo" 
-            # --assignee "@copilot"
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE: ${{ toJson(matrix.issue) }}
           REPO: ${{ needs.test_action.outputs.repo }}
-          PAT: ${{secrets.PAT}}
+        run: |
+          echo "Raw ISSUE:"
+          echo "$ISSUE"
+          title="$(echo "$ISSUE" | jq -r '.title // empty')"
+          body="$(echo "$ISSUE" | jq -r '.body // empty')"
+          label="$(echo "$ISSUE" | jq -r '.label // empty')"
+          repo="$REPO"
+
+          if [[ -z "$title" || -z "$body" ]]; then
+            echo "Skipping invalid issue (missing title/body)"
+            exit 0
+          fi
+
+          echo "Creating issue: $title (label=$label)"
+
+          gh issue create \
+            --title "$title" \
+            --body "$body" \
+            $( [ -n "$label" ] && printf -- '--label %q ' "$label" ) \
+            --repo "$repo"
