@@ -49,11 +49,28 @@ jobs:
 
           # Getting reports/*.md content from the neurodiversity-check PR 
           gh pr checkout "$ISSUE_NB"
-          concat=$(for f in reports/*.md; do echo "/* REPORT: $f */"; cat "$f"; echo; done)      
-          JSON_MIN=$(printf '%s\n' "$concat")
           
-          # JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
-          printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
+          # Concat (attention si aucun fichier)
+          shopt -s nullglob
+          files=(reports/*.md)
+          if (( ${#files[@]} == 0 )); then
+            {
+              echo 'report<<EOF'
+              echo "(Aucun fichier reports/*.md trouvé)"
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
+          concat=$(for f in "${files[@]}"; do echo "/* REPORT: $f */"; cat "$f"; echo; done)
+          
+          # Sortie multi-ligne correcte
+          {
+            echo 'report<<EOF'
+            printf '%s\n' "$concat"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+          
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
         id: gen_issues
