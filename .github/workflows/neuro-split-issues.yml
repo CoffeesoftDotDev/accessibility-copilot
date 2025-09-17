@@ -105,6 +105,7 @@ jobs:
 
           # Authenticating GH CLI with PAT to be able to assign Copilot to work on an issue 
           echo "$PAT" | gh auth login --with-token 
+          # Requested by https://cli.github.com/manual/gh_issue_create 
           gh auth refresh -s project
       
           # Use gh issue create with safe quoting
