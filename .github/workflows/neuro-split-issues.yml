@@ -47,9 +47,10 @@ jobs:
             exit 0
           fi
 
-          # Getting report.md content from the neurodiversity-check PR 
+          # Getting reports/*.md content from the neurodiversity-check PR 
           gh pr checkout "$ISSUE_NB"
-          JSON_MIN=$(cat report.md)
+          concat=$(for f in reports/*.md; do echo "/* REPORT: $f */"; cat "$f"; echo; done)      
+          JSON_MIN=$(printf '%s\n' "$concat")
           
           # JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
           printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
