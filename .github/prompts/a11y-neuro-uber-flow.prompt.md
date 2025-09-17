@@ -4,7 +4,7 @@ tools: ['codebase','usages','problems','fetch','todos']
 output_format: 'markdown'
 # Nouveau champ personnalisé: chemin de sortie fichier Markdown final.
 # L'orchestrateur / agent DOIT écrire (écrasement) la sortie finale canonique dans ce fichier à la racine du repo.
-output_destination: 'report.md'
+output_destination: 'report.md' & Pull_Request final Description
 # Audit Neuro-Inclusif
 
 ## Orchestration (Meta)
