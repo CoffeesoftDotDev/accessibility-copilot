@@ -1,7 +1,7 @@
 name: Pull request review issues creation
 on: 
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: [ready_for_review]
   issues:
     types: [opened, edited]
 
