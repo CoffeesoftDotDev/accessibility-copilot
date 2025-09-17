@@ -151,7 +151,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueResult.repository.issue.number,
-                body: `🤖 @${copilotBot.login} execute prompts located in .github/prompts/a11y-neuro-uber-flow.prompt.md`
+                body: `🤖 @${copilotBot.login} execute prompts located in : \n-.github/prompts/a11y-neuro-uber-flow.prompt.md\n-.github/prompts/a11y-e2e-review.prompt.md`
               });
 
             } catch (error) {
