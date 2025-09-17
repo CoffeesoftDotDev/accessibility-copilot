@@ -17,6 +17,9 @@ Séquence d’exécution recommandée (stop-on-error=false, agréger résultats 
 4. Overview: `a11y-neuro-audit-overview.prompt.md` → synthèse haut niveau & matrices.
 5. Fusion: appliquer Algorithme fusion (ci‑dessous) pour produire la sortie Markdown canonique (sections A–L) + tableaux Action Plan & Backlog.
 
+## Important rule : 
+DO NOT EDIT NOR ADVISE CODE CHANGES FOR ANY FILE IN THE REPO. YOUR JOB IS TO FOCUS ON A CONSOLIDATED REPORT OF FEATURE/UX RECOMMENDATIONS, THE TECHNICAL IMPLEMENTATION ASPECTS WILL BE MANAGED IN A PROCESS LATER ON.
+
 Chaque sous-prompt conserve sa structure interne; ce méta prompt impose un ordre consolidé final (sections A→L) pour la restitution Markdown.
 
 Phases (succinct – correspondance sections finales):
