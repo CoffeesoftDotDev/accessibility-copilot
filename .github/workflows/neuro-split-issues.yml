@@ -5,10 +5,11 @@ on:
   issues:
     types: [opened, edited]
 
-permissions: write-all
-#  issues: write
-#  contents: read
-#  models: read
+permissions:
+  issues: write
+  contents: read
+  models: read
+  pull-requests: read
 
 jobs:
   test_action:
@@ -46,10 +47,11 @@ jobs:
             exit 0
           fi
 
-          gh pr checkout 32 
-          cat report.md
+          # Getting report.md content from the neurodiversity-check PR 
+          gh pr checkout "$ISSUE_NB"
+          JSON_MIN=$(cat report.md)
           
-          JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
+          # JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
           printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
