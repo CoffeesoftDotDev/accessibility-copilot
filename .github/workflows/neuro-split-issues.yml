@@ -35,7 +35,7 @@ jobs:
         run: gh extension install https://github.com/github/gh-models
 
       - name: Get PR report details
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
         id: pr_report_details
         run: |-
           # Déterminer le numéro (PR review event vs issue event)
@@ -45,7 +45,11 @@ jobs:
             echo "report={}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url | jq -c .)
+
+          gh pr checkout 32 
+          cat report.md
+          
+          JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url, | jq -c .)
           printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
