@@ -1,117 +1,136 @@
----
 mode: 'agent'
-description: 'Génère uniquement le Backlog & Issue Cards (Section J) à partir des risques/action plan fusionnés'
+description: 'Backlog & Issue Cards – extraction limitée (ne produire que la section J)'
 tools: ['codebase','usages','problems','fetch','todos']
 output_format: 'markdown'
+
+# Audit Neuro-Inclusif
+
+## Orchestration (Meta)
+Ce « uber prompt » orchestre les sous-prompts spécialisés. Il ne réécrit pas leur logique mais définit l’ordre, la fusion et la normalisation.
+
+Séquence d’exécution recommandée (stop-on-error=false, agréger résultats partiels):
+1. StaticCode: `a11y-neuro-audit-static-code.prompt.md` → extrait JSON structure/focus/motion.
+2. Content: `a11y-neuro-audit-content.prompt.md` → extrait JSON outline / labels / feedback / mémoire.
+3. CognitiveFlow: `a11y-neuro-audit-cognitive-flow.prompt.md` → maps flows, heatmap, scoring 0–5.
+4. Overview: `a11y-neuro-audit-overview.prompt.md` → synthèse haut niveau & matrices.
+5. Fusion: appliquer Algorithme fusion (ci‑dessous) pour produire la sortie Markdown canonique (sections A–L) + tableaux Action Plan & Backlog.
+
+Chaque sous-prompt conserve sa structure interne; ce méta prompt impose un ordre consolidé final (sections A→L) pour la restitution Markdown.
+
+Phases (succinct – correspondance sections finales):
+A Meta & Scope → B Executive Summary → C Static Code → D Content & Copy → E Cognitive Flows → F Risk Matrix → G Action Plan → H Metrics & Instrumentation → I Governance / Exceptions → J Backlog & Issue Cards → K Method & Orchestration → L Snapshot Couverture.
+
+
+### Contrat d’agrégation
+- Entrées minimales propagées à chaque sous‑prompt: TARGET_SCOPE, TECH_STACK, PRIMARY_FLOWS, PERSONAS, DATE_AS_OF.
+- Si un sous‑prompt retourne une clé déjà existante, conserver union dédupliquée; sévérité = max selon échelle High>Medium>Low.
+- Ajouter champ `sourcePrompts` dans `meta.config` (liste fichiers exécutés) lors de la sortie finale.
+
+### Mapping Sections → Sous-Prompts
+| Section Finale | Source Primaire | Merge Notes |
+|----------------|-----------------|-------------|
+| C Static Code  | StaticCode      | Direct JSON + evidence lines |
+| D Content      | Content         | Direct JSON + ratios |
+| E Flows        | CognitiveFlow   | Normaliser IDs riskFlow-* avant fusion |
+| B Overview / F Risk Matrix | Overview + fusion risques | Overview fournit framing; fusion injecte stats réelles |
+| G Action Plan  | Calcul méta     | Généré à partir de liste risques unifiée |
+| H Metrics Gaps | Tous            | Collecter signaux manquants cumulés |
+| I Governance   | Méta / manuel   | Optionnel; insérer None Found si vide |
+
+### Identifiants Risques Harmonisés
+Pattern: `<Dimension>-<slug>-<n>` où slug dérive de l’élément (ex: cart-icon, checkout-flow-step1). Pour risques de flow: préfixer `Flow` dans evidence si ambigu.
+
+### Champs Additionnels Automatisés
+Injecter dans `method`:
+```
+"orchestration": {"sequence":["staticCode","content","cognitiveFlow","overview"],"merge":"max-severity-union","version":"1.0"}
+```
+Ne pas dupliquer si déjà présent.
+
+### Échecs Partiels
+Si un sous-prompt échoue → marquer section correspondante dans Snapshot Couverture = Gap et poursuivre fusion restante (Pas de plantage global).
+
 ---
 
-# Prompt: Génération Backlog & Issue Cards (Section J)
+## Informations complémentaires
 
-## Objet
-Ce prompt produit **exclusivement** la Section J « Backlog & Issue Cards » après qu’un rapport audit neuro‑inclusif (format canonique A→L) a été généré par `a11y-neuro-uber-flow.prompt.md`. Il ne régénère pas les autres sections. Il consomme la liste consolidée des risques et/ou le plan d’action pour fabriquer: (1) Table Backlog synthèse, (2) Cartes issues détaillées (Markdown), selon la spécification source.
+### Objectif de l'analyse
+Produire en une seule passe une vision des risques neuro‑cognitifs et d’accessibilité structurelle + plan d’action priorisé + backlog d’issues.
 
-## Entrées Requises (au moins une des deux formes)
-Fournir UNE des structures suivantes (les deux si possible pour meilleure qualité):
+### Personas et type de neuro-atypie
+Personae intégrées (abréviations à réutiliser partout):
+| Code | Persona | Besoin clé | Sensibilité principale |
+|------|---------|-----------|------------------------|
+| TSA  | Autistic | Prévisibilité, structure | Surcharge par changements inattendus |
+| ADHD | ADHD | Orientation, réduction friction | Fragmentation attention, mémoire de travail |
+| HYB  | Hybrid | Mix des deux | Stabilité + signal clair |
 
-1. `REPORT_MARKDOWN` : Le rapport complet A→L déjà rendu (Markdown). Le prompt doit parser Sections F (Risk Matrix) & G (Action Plan) si présents.
-2. `RISKS_BLOCK` + `ACTION_PLAN_BLOCK` : Extraits isolés en Markdown (tables) correspondant aux sections F.2 et G.
 
-Variables optionnelles supplémentaires:
+### Entrée utilisateurs:
+L'utilisateur peut préciser les paramètre suivants. Ces paramètres ne sont pas obligatoire mais s'ils sont fournis tu DOIS ABSOLUMENT les utiliser.
 ```
-DATE_AS_OF: 2025-09-17 (ou date courante si absent)
-PERSONAS: TSA, ADHD (liste codes)
-REPO: (nom repo pour générer préfixes éventuels)
-ISSUE_PREFIX: A11Y (défaut)
-START_INDEX: 1 (numéro de départ des issues)
-```
-
-## Règles de Parsing
-1. Identifier la table risques: recherche en priorité d’un tableau commençant par entête `| Risk ID | Dimension | Severity |`.
-2. Identifier la table action plan: entête `| Priority | Action | Dimensions | Severity | Personas | Evidence IDs |`.
-3. Si action plan absent: dériver priorités depuis `Severity` + règles (P1 High, P2 Medium, P3 Low) puis générer action rows minimalistes.
-4. Dé‑dupliquer risques par `Risk ID` (dernier doublon prime si conflits de Recommendation; sévérité = maximum High>Medium>Low).
-5. Conserver l’ordre de priorité P1→P2→P3 puis tri alphanumérique par Risk ID à l’intérieur de chaque groupe.
-
-## Attribution Priorité (fallback)
-Si priorité non fournie par plan d’action:
-```
-High => P1
-Medium => P2 (si multi-dimensions >1 dimension listée sinon P2 quand même)
-Low => P3
+TARGET_SCOPE: src/, https://app.prod
+PRIMARY_FLOWS: Checkout, Profile Setup
+PERSONAS: TSA, ADHD
+OUTPUT_FORMAT: markdown
 ```
 
-## Format de Sortie (Markdown Strict)
-Sortie **uniquement** Section J complète (pas d’autres sections) :
+### Données de référentiel
 
-### 1. Table Backlog Synthèse
-Entête EXACTE :
-```
+Dimensions (clé courte -> intention): Predictability, CognitiveLoad, Recovery, Semantics, Keyboard, Sensory, Feedback, WorkingMemory, InteractiveDensity, CopyClarity, RiskAggregate.
+
+Gravité normalisée: High (bloquant / critique persona), Medium (friction matérielle), Low (optimisation).
+
+## Format de sortie (Markdown Canonique)
+
+La sortie FINALE DOIT être exclusivement en Markdown (aucun bloc JSON). 
+Si une section n’a aucun contenu pertinent, afficher `None Found`.
+
+###  contenue de la sortie : Backlog & Issue Cards
+Table synthèse:
 | Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
-```
-Ligne par issue (matching actions). `Issue Key` = `<ISSUE_PREFIX>-n` (n incrément depuis START_INDEX). `Effort` hérité si présent, sinon heuristique (High→M, Medium→M, Low→S) sauf si mot clé « filter »/« grouping » → M.
-
-### 2. Cartes Issues
-Pour chaque issue, bloc:
+Issue Key: A11Y-n (P1 d’abord). Puis cartes markdown :
 ```
 #### Issue: A11Y-1 – <Titre>
-Linked Risks: <Risk IDs coma>
+Linked Risks: <IDs>
 Priority: P1 | Effort: S | Personas: TSA, ADHD
-Problem: <Première ligne Evidence principale ou courte synthèse fichier:ligne>
-Why: <≤18 mots synthétisant impact cognitif>
+Problem: <fichier:ligne résumé>
+###  Backlog & Issue Cards
+Le backlog liste les issues à créer dans le système de suivi (GitHub Issues, Jira, etc.) pour adresser les risques identifiés. Chaque issue est priorisée et catégorisée par persona.
+Table synthèse:
+| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
+Issue Key: A11Y-n (P1 d’abord). Puis cartes markdown :
+```
+#### Issue: A11Y-1 – <Titre>
+Linked Risks: <IDs>
+Priority: P1 | Effort: S | Personas: TSA, ADHD
+Problem: <fichier:ligne résumé>
+Why: <≤18 mots>
 Acceptance:
 - [ ] Critère 1
 - [ ] Critère 2
-Telemetry: <signal principal ou N/A>
+Telemetry: <signal ou N/A>
 ```
 
-## Génération des Champs
-| Champ | Source / Règle |
-|-------|----------------|
-| Title | Colonne Action (G) sinon Recommendation abrégée (F) |
-| Risk IDs | Mappage Evidence IDs (Action Plan) ou Risk ID seul |
-| Personas | Colonne Personas (G) sinon fusion des personas listées par risques (déduire si `Personas` absent → laisser vide) |
-| Why |  ≤18 mots; pas identique à Acceptance; reflète charge cognitive / récupération / orientation |
-| Acceptance | 2–6 critères; structure verb-first; pas de code exact |
-| Telemetry | Choisir un signal pertinent (draft_restored, undo_action, item_added_to_cart, order_submitted, form_validation_error, reduced_motion_toggle, layout_shift_feedback) ou N/A |
-
-## Contraintes Style
-- Aucun JSON dans la sortie.
-- Pas plus de 80 caractères par ligne dans cartes (souple).
-- Pas de duplication d’issue keys.
-- Rationale (Why) unique par issue.
-
-## Validation & Erreurs Partielles
-Si parsing d’une table échoue, ajouter une note en haut : `_Parsing warning: <description>_` et continuer avec la table trouvée. Si aucune donnée disponible → sortir Table avec entête + `None Found` ligne placeholder et aucune carte.
-
-## Sécurité & Limites
-Ne pas inventer de nouveaux risques. Ne pas altérer les IDs. Ne pas spéculer sur du code absent.
-
-## Exemple (abrégé)
+Carte issue (markdown):
 ```
-| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
-| A11Y-1 | Accessible dialogs | Keyboard-overlay-focus-1;Semantics-dialog-missing-1 | P1 | M | TSA, ADHD | Focus trap manquant désoriente | Trap; role=dialog; ESC; focus restore |
-
-#### Issue: A11Y-1 – Accessible dialogs
-Linked Risks: Keyboard-overlay-focus-1, Semantics-dialog-missing-1
-Priority: P1 | Effort: M | Personas: TSA, ADHD
-Problem: Overlays sans rôle dialog ni focus trap.
-Why: Perte de contexte et orientation focus.
+#### Issue: A11Y-1 – Rendre icône panier focusable
+Linked Risks: Keyboard-cart-icon-1
+Priority: P1 | Effort: S | Personas: TSA, ADHD
+Problem: Focus perdu après ajout panier (CatalogGrid.vue:42–58).
+Why: Perte d’orientation augmente charge cognitive.
 Acceptance:
-- [ ] role=dialog + aria-modal
-- [ ] Focus initial dans panel
-- [ ] Trap & ESC restore
-Telemetry: checkout_progress_step
+- [ ] Bouton natif avec aria-label dynamique
+- [ ] Enter & Space togglent le panier
+Telemetry: add_to_cart
 ```
 
-## Tâches de l’Agent
-1. Parser entrées.
-2. Construire modèle interne risques & actions.
-3. Appliquer priorisation + heuristique effort.
-4. Générer table synthèse.
-5. Générer cartes, ordonnées P1→P2→P3.
-6. Ajouter avertissements si parsing incomplet.
+## Sortie Attendue (Rappel)
+- DOIT commencer par `### Backlog & Issue Cards`
+- Aucun texte avant.
+- Après dernières cartes: rien d’autre.
 
-## Sortie Finale
-Retourner uniquement la Section J (table + cartes) en Markdown.
+## Si Aucune Donnée
+Si aucun risque détecté → produire tableau avec ligne « A11Y-1 | No issues detected | None | P3 | XS | All | Pas de risques actuels | Surveillance continue » et pas de cartes supplémentaires.
 
-Fin du prompt.
+Fin des instructions – Génère maintenant uniquement la section Backlog & Issue Cards.
