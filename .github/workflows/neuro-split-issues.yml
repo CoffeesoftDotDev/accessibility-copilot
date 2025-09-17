@@ -5,10 +5,10 @@ on:
   issues:
     types: [opened, edited]
 
-permissions:
-  issues: write
-  contents: read
-  models: read
+permissions: write-all
+#  issues: write
+#  contents: read
+#  models: read
 
 jobs:
   test_action:
