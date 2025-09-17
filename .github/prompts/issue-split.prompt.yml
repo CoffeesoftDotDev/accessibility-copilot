@@ -1,6 +1,6 @@
 name: Issue splitter
 description: Split a report into separate issues
-model: openai/gpt-5
+model: openai/gpt-4.1
 responseFormat: json_schema
 jsonSchema: |-
   {
