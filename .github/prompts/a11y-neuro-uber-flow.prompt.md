@@ -1,9 +1,10 @@
----
 mode: 'agent'
 description: 'Audit neuro-inclusif condensé (structure + cognition + flows + priorisation)'
 tools: ['codebase','usages','problems','fetch','todos']
-output_format: 'markdown|json|hybrid'
----
+output_format: 'markdown'
+# Nouveau champ personnalisé: chemin de sortie fichier Markdown final.
+# L'orchestrateur / agent DOIT écrire (écrasement) la sortie finale canonique dans ce fichier à la racine du repo.
+output_destination: 'report.md'
 # Audit Neuro-Inclusif
 
 ## Orchestration (Meta)
@@ -14,11 +15,12 @@ Séquence d’exécution recommandée (stop-on-error=false, agréger résultats 
 2. Content: `a11y-neuro-audit-content.prompt.md` → extrait JSON outline / labels / feedback / mémoire.
 3. CognitiveFlow: `a11y-neuro-audit-cognitive-flow.prompt.md` → maps flows, heatmap, scoring 0–5.
 4. Overview: `a11y-neuro-audit-overview.prompt.md` → synthèse haut niveau & matrices.
-5. Fusion: appliquer Algorithme fusion (ci‑dessous) pour produire UnifiedAuditJSON + tableaux Action Plan & Backlog.
+5. Fusion: appliquer Algorithme fusion (ci‑dessous) pour produire la sortie Markdown canonique (sections A–L) + tableaux Action Plan & Backlog.
 
-Chaque sous-prompt conserve son ordre de clés interne; ce méta prompt impose ensuite l’ordre d'éxécution A→J défini ci-dessous:
+Chaque sous-prompt conserve sa structure interne; ce méta prompt impose un ordre consolidé final (sections A→L) pour la restitution Markdown.
 
-Phases (succinct): A Inputs → B Overview → C Static Code → D Content → E Flows → F Synthèse & Risk Matrix → G Action Plan → H Metrics Gaps → I Governance → J Executive + Backlog.
+Phases (succinct – correspondance sections finales):
+A Meta & Scope → B Executive Summary → C Static Code → D Content & Copy → E Cognitive Flows → F Risk Matrix → G Action Plan → H Metrics & Instrumentation → I Governance / Exceptions → J Backlog & Issue Cards → K Method & Orchestration → L Snapshot Couverture.
 
 
 ### Contrat d’agrégation
@@ -61,8 +63,8 @@ Produire en une seule passe une vision des risques neuro‑cognitifs et d’acce
 Personae intégrées (abréviations à réutiliser partout):
 | Code | Persona | Besoin clé | Sensibilité principale |
 |------|---------|-----------|------------------------|
-| TSA  | Autistic Analytical | Prévisibilité, structure | Surcharge par changements inattendus |
-| ADHD | ADHD Creative | Orientation, réduction friction | Fragmentation attention, mémoire de travail |
+| TSA  | Autistic | Prévisibilité, structure | Surcharge par changements inattendus |
+| ADHD | ADHD | Orientation, réduction friction | Fragmentation attention, mémoire de travail |
 | HYB  | Hybrid | Mix des deux | Stabilité + signal clair |
 
 
@@ -70,11 +72,8 @@ Personae intégrées (abréviations à réutiliser partout):
 L'utilisateur peut préciser les paramètre suivants. Ces paramètres ne sont pas obligatoire mais s'ils sont fournis tu DOIS ABSOLUMENT les utiliser.
 ```
 TARGET_SCOPE: src/, https://app.prod
-TECH_STACK: Vue 3 + Vite + Tailwind
 PRIMARY_FLOWS: Checkout, Profile Setup
 PERSONAS: TSA, ADHD
-KNOWN_METRICS: CLS p75=0.12, Undo usage=3.1%
-DATE_AS_OF: 2025-09-16
 OUTPUT_FORMAT: markdown
 ```
 
@@ -84,22 +83,81 @@ Dimensions (clé courte -> intention): Predictability, CognitiveLoad, Recovery, 
 
 Gravité normalisée: High (bloquant / critique persona), Medium (friction matérielle), Low (optimisation).
 
-## Format de sortie
+## Format de sortie (Markdown Canonique)
 
-Schéma UnifiedAuditJSON minimal (ordre stable):
+La sortie FINALE DOIT être exclusivement en Markdown (aucun bloc JSON). Ordre des sections A→L strict. Si une section n’a aucun contenu pertinent, afficher `None Found`.
+
+### Ordre & Ancres
+1. A. Meta & Scope (# meta)
+2. B. Executive Summary (# executive-summary)
+3. C. Static Code Findings (# static-code)
+4. D. Content & Copy (# content-copy)
+5. E. Cognitive Flows (# cognitive-flows)
+6. F. Risk Matrix & Dimension Overview (# risk-matrix)
+7. G. Action Plan (Prioritized) (# action-plan)
+8. H. Metrics & Instrumentation Gaps (# metrics-gaps)
+9. I. Governance / Exceptions (# governance)
+10. J. Backlog & Issue Cards (# backlog)
+11. K. Method & Orchestration (# method)
+12. L. Snapshot Couverture (# snapshot-couverture)
+
+### A. Meta & Scope
+Inclure: Date, Target Scope, Personas (codes), Primary Flows, Source Prompts exécutés, Config d’orchestration (sequence, merge, version).
+
+### B. Executive Summary
+≤10 bullets (≤18 mots chacun) synthétisant risques High, patterns critiques, manques instrumentation. Totaux: High / Medium / Low + Top 3 Dimensions.
+
+### C. Static Code Findings
+Sous-sections: Landmarks & Structure; Keyboard & Focus; Motion & Sensory; Semantics / ARIA. Tableau:
+| ID | Dimension | Severity | Evidence (fichier:ligne) | Recommendation | Rationale (≤18w) | Personas |
+|----|-----------|----------|--------------------------|----------------|------------------|----------|
+
+### D. Content & Copy
+Inclure Outline Headings, Labels, Metrics (mots/sentence, % verb-first), Feedback & Error Patterns. Même format de tableau.
+
+### E. Cognitive Flows
+Pour chaque flow: étapes numérotées, heatmap frictions (0–5), risques (IDs `Flow-...`), éléments de récupération (undo/draft) présents/absents.
+
+### F. Risk Matrix & Dimension Overview
+1. Tableau dimensions:
+| Dimension | High | Medium | Low | Notes |
+|-----------|------|--------|-----|-------|
+2. Tableau risques consolidés:
+| Risk ID | Dimension | Severity | Evidence | Recommendation | Rationale (≤18w) | Refs | Personas |
+Tri: High → Medium → Low puis alpha.
+
+### G. Action Plan (Prioritized)
+| Priority | Action | Dimensions | Severity | Personas | Evidence IDs | Spec Refs | Rationale (≤18w) | Impact Attendu | Effort |
+Priorisation: P1 (High critique persona / Anti-Pattern), P2 (Medium multi-dimensions), P3 (Low/optimisation). Effort: S/M/L.
+
+### H. Metrics & Instrumentation Gaps
+| Signal | Present? | Source | Gap Rationale | Suggested Event Payload | Priority |
+Exemples signaux: draft_restored, undo_action, layout_shift_feedback, reduced_motion_toggle, autosave_error.
+
+### I. Governance / Exceptions
+| Date | Component | Rule Relaxed | Justification | Mitigation | Owner |
+`None Found` si aucune exception.
+
+### J. Backlog & Issue Cards
+Table synthèse:
+| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
+Issue Key: A11Y-n (P1 d’abord). Puis cartes markdown :
 ```
-{
-  "meta": {"date":"<DATE_AS_OF>","targetScope":"...","personas":["TSA","ADHD"],"config":{}},
-  "summary": {"highRiskCount":0,"mediumRiskCount":0,"lowRiskCount":0,"topDimensions":[]},
-  "risks": [ {"id":"Keyboard-cart-icon-1","dimension":"Keyboard","severity":"High","evidence":"...","recommendation":"...","rationale":"Empêche perte de focus / navigation bloquée","refs":["§8"],"personas":["TSA","ADHD"]} ],
-  "actionPlan": [ {"priority":"P1","action":"Corriger focus cart","riskIds":["Keyboard-cart-icon-1"],"rationale":"Navigation linéaire fiable","effort":"S"} ],
-  "metricsGaps": [ {"signal":"undo_action","present":false,"priority":"High"} ],
-  "governance": [ {"component":"Checkout","ruleRelaxed":"Autosave différé","justification":"Revue sécurité"} ],
-  "method": {"dataSources":["static-code","content"],"normalization":"max-severity","version":"1.2"}
-}
+#### Issue: A11Y-1 – <Titre>
+Linked Risks: <IDs>
+Priority: P1 | Effort: S | Personas: TSA, ADHD
+Problem: <fichier:ligne résumé>
+Why: <≤18 mots>
+Acceptance:
+- [ ] Critère 1
+- [ ] Critère 2
+Telemetry: <signal ou N/A>
 ```
 
-Snapshot Couverture:
+### K. Method & Orchestration
+Lister: sequence `[staticCode, content, cognitiveFlow, overview]`, merge = `max-severity-union`, version orchestration. Décrire Algorithme fusion (signature dimension+fichier+élément; union evidence dédupliquée; severity=max; refs union triées; tri final High→Low→alpha). Mention gestion échecs partiels (section marquée Gap, traitement continue).
+
+### L. Snapshot Couverture
 | Aire | Statut | Note | Scope Summary |
 |------|--------|------|---------------|
 | Landmarks | Pending |  | Points d’ancrage + skip |
@@ -163,6 +221,6 @@ Algorithme fusion (condensé): signature=(dimension+fichier+élément); merge ev
 Exemples bullets exécutif:
 - Focus initial manquant sur modale (High Keyboard)
 - Absence undo sur profil multi-étapes (High Recovery)
-- Libellés ambigus sur actions secondaires (Medium CopyClarity)
+- Libellés ambigus actions secondaires (Medium CopyClarity)
 
 Fin du prompt
