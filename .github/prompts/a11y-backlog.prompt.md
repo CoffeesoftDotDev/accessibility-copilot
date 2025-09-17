@@ -1,5 +1,5 @@
 mode: 'agent'
-description: 'Backlog & Issue Cards – extraction limitée (ne produire que la section J)'
+description: 'Backlog & Issue Cards – extraction limitée'
 tools: ['codebase','usages','problems','fetch','todos']
 output_format: 'markdown'
 
@@ -94,7 +94,7 @@ Objectif: Générer (section J uniquement) un backlog priorisé des risques a11y
 
 Règles générales:
 - Aucun texte avant le titre `### Backlog & Issue Cards` dans la sortie finale.
-- Pas de JSON; Markdown pur.
+- JSON pur.
 - Si 0 risque: produire le tableau avec la ligne neutre (cf. cas vide) et aucune carte.
 - Les colonnes ne doivent pas être réordonnées; alignement libre Markdown.
 - `Why` ≤ 18 mots (compter mots séparés par espaces).
@@ -128,24 +128,7 @@ Acceptance:
 Telemetry: <eventName ou N/A>
 ```
 
-Exemple minimal (illustratif):
-```
-### Backlog & Issue Cards
-| Issue Key | Title | Risk IDs | Priority | Effort | Personas | Why (≤18w) | Acceptance (condensée) |
-| A11Y-1 | Rendre icône panier accessible clavier & SR | Keyboard-cart-icon-1; Semantics-cart-icon-2 | P1 | S | TSA, ADHD | Icône non focusable désoriente navigation | Bouton rôle+aria-label; Focus visible; Enter/Space actifs |
-
-#### Issue: A11Y-1 – Rendre icône panier accessible clavier & SR
-Linked Risks: Keyboard-cart-icon-1; Semantics-cart-icon-2
-Priority: P1 | Effort: S | Personas: TSA, ADHD
-Problem: CartIcon.vue: div clickable sans role ni tabindex
-Why: Absence focusable element casse repères utilisateurs clavier
-Acceptance:
-- [ ] Wrapper remplacé par `<button>` natif
-- [ ] `aria-label` dynamique avec nombre articles
-- [ ] Enter & Space déclenchent `toggleCart`
-- [ ] Anneau focus contraste ≥3:1
-Telemetry: cart_open
-```
+<!-- Exemple minimal retiré sur demande: la génération ne doit plus inclure d'exemple pré-rempli. -->
 
 ## Sortie Attendue (Rappel)
 - DOIT commencer par `### Backlog & Issue Cards`
@@ -155,4 +138,4 @@ Telemetry: cart_open
 ## Si Aucune Donnée
 Si aucun risque détecté → produire tableau avec ligne « A11Y-1 | No issues detected | None | P3 | XS | All | Pas de risques actuels | Surveillance continue » et pas de cartes supplémentaires.
 
-Fin des instructions – Génère maintenant uniquement la section Backlog & Issue Cards.
+Fin des instructions
