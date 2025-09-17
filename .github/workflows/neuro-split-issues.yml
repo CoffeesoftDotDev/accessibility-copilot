@@ -26,7 +26,7 @@ jobs:
       - name: Get Context
         id: get_context
         run: |-
-          echo "repo=${{github.event.repository.name}}" >> "GITHUB_OUTPUT"
+          echo "repo=${{github.event.repository.name}}" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -40,16 +40,13 @@ jobs:
         run: |-
           # Déterminer le numéro (PR review event vs issue event)
           ISSUE_NB="${{ github.event.pull_request.number || github.event.issue.number }}"
-
           if [ -z "$ISSUE_NB" ]; then
             echo "Aucun numéro d'issue/PR détecté dans ce type d'événement."
             echo "report={}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
           JSON_MIN=$(gh issue view "$ISSUE_NB" --json number,title,body,url | jq -c .)
           printf 'report=%s\n' "$JSON_MIN" >> "$GITHUB_OUTPUT"
-
       - name: Generate Issue Descriptions
         if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: gen_issues
