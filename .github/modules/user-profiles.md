@@ -52,18 +52,6 @@ Use: During refinement, pick at least TWO distinct personas—ensure proposed so
 | Real-time feed updates pushing content | Loss of position | Offer manual refresh toggle |
 | Long form resets on validation error | High frustration | Inline per-field validation + preserve data |
 
-### 1.5 Success Metrics (Example)
-| Metric | Target |
-|--------|--------|
-| Form abandonment (multi-step) | < 10% after step 1 |
-| Undo usage after destructive action | > 40% (indicates discovery + safety) |
-| Unexpected layout shift complaints (feedback channel) | 0 per release |
-
-### 1.6 Prompt Authoring Guidance (AI)
-Embed constraints: "Return deterministic section order; avoid figurative language; provide explicit numbered steps; summarize state changes in bullet form." 
-
----
-
 ## 2. Persona: ADHD  Person (TDAH-Creative)
 | Dimension | Detail |
 |-----------|--------|
@@ -105,17 +93,6 @@ Embed constraints: "Return deterministic section order; avoid figurative languag
 | Long upload w/out progress | Repeated triggers | Provide progress bar + estimated time |
 | Complex settings panel w/out grouping | Cognitive fatigue | Chunk into collapsible, labeled sections |
 
-### 2.5 Success Metrics
-| Metric | Target |
-|--------|--------|
-| Draft restoration success rate | ≥ 95% |
-| Re-triggered identical async actions | < 5% of total async ops |
-| Missed confirmation complaints | Declining trend release-over-release |
-
-### 2.6 Prompt Authoring Guidance (AI)
-Embed constraints: "Chunk instructions; surface primary action first; provide optional focus mode variant; re-state goal after each major section." 
-
----
 
 ## 3. Persona: Overlapping Neurodivergent (TSA+TDAH Hybrid)
 | Dimension | Detail |
@@ -157,18 +134,6 @@ Embed constraints: "Chunk instructions; surface primary action first; provide op
 | Switching between 3 drafts loses 2 states | Abandonment | Persist + surface open draft list |
 | Async completion triggers modal | Cognitive break | Route to notification log instead |
 
-### 3.5 Success Metrics
-| Metric | Target |
-|--------|--------|
-| Successful task switching without loss (self-report) | ≥ 90% |
-| Reported disorientation events | Trend toward zero |
-| Time to recover prior session | < 10 seconds |
-
-### 3.6 Prompt Authoring Guidance (AI)
-Embed constraints: "Offer both concise summary and expandable detail; avoid simultaneous multi-branch instructions; include optional queue representation." 
-
----
-
 ## 4. Comparative Needs Matrix
 | Dimension | TSA Analytical | ADHD Creative | Overlapping Hybrid |
 |-----------|---------------|---------------|--------------------|
@@ -202,33 +167,5 @@ Shared high-impact investments:
 | QA | Execute scenario table (Sections 1.4 / 2.4 / 3.4) | Log deviations |
 | Release | Publish delta of metrics vs targets | Adjust next sprint backlog |
 
----
-
-## 7. Metric Instrumentation Notes
-| Metric | Signal Source | Implementation Hint |
-|--------|---------------|---------------------|
-| Draft restoration success | Local storage restore events | Emit custom event `draft_restored` |
-| Undo usage | Undo component action dispatch | Count distinct entity reversals |
-| Async action re-trigger rate | API call fingerprints within debounce window | Tag calls with correlation IDs |
-| Layout shift complaints | In-app feedback form taxonomy | Filter for label `layout_shift` |
-| Time to recover session | Timestamp from load → first restored draft | Track via perf marks |
-
----
-
-## 8. AI Prompt Embedding Examples
-| Use Case | Prompt Insert |
-|----------|--------------|
-| Generate help panel | "Return Summary first, Detailed Steps second, Recovery third. Sentences ≤ 20 words." |
-| Summarize changes | "List changes as bullet list: (<entity>) <action>. No prose filler." |
-| Create form microcopy | "Label clarity first; no metaphors; if error states, provide cause + resolution." |
-
----
-
-## 9. Maintenance
-- Review personas quarterly for emergent patterns.
-- If a mitigation is deprecated, update both the persona section and parent instructions.
-- Changes require version bump (append minor v1.x → v1.(x+1)).
-
----
-
+--
 End of user profiles (personas) module.
