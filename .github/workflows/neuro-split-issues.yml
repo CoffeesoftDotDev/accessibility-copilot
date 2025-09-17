@@ -26,7 +26,7 @@ jobs:
       - name: Get Context
         id: get_context
         run: |-
-          echo "repo=${{github.event.repo.name}}" >> "$GITHUB_OUTPUT"
+          echo "repo=${{github.repository}}" >> "$GITHUB_OUTPUT"
           echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
