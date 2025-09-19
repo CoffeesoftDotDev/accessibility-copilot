@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <header class="header">
       <div class="header-content">
         <div class="title-section">
@@ -10,7 +11,7 @@
       </div>
     </header>
 
-    <main class="main">
+    <main id="main" tabindex="-1" class="main">
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
         <p>Loading albums...</p>
@@ -68,6 +69,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  z-index: 1000;
+  padding: 0.5rem;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  border: 2px solid #000;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  outline: 2px solid #000;
+}
+
 .app {
   min-height: 100vh;
   padding: 2rem;
