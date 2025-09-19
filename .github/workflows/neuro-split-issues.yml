@@ -12,7 +12,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  test_action:
+  generate_tasks:
     runs-on: ubuntu-latest
     outputs: 
       reports: ${{ steps.pr_report_details.outputs.reports }}
@@ -36,7 +36,7 @@ jobs:
         run: gh extension install https://github.com/github/gh-models
 
       - name: Get PR report details
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: pr_report_details
         run: |-
           set -euo pipefail
@@ -78,7 +78,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Generate Issue Descriptions
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neurodiversity-check')
+        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
         id: gen_issues
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
@@ -169,8 +169,8 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
-  create_issues:
-    needs: test_action
+  add_to_backlog:
+    needs: generate_tasks
     if: ${{ needs.test_action.outputs.issues != '' }}
     runs-on: ubuntu-latest
     strategy:
