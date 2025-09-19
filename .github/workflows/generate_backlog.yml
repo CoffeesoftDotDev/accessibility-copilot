@@ -36,7 +36,7 @@ jobs:
         run: gh extension install https://github.com/github/gh-models
 
       - name: Get PR report details
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'neurodiversity-check')
         id: pr_report_details
         run: |-
           set -euo pipefail
@@ -78,7 +78,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Generate Issue Descriptions
-        if: contains(join(github.event.issue.labels.*.name, ','), 'neuro-test')
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'neurodiversity-check')
         id: gen_issues
         env:
           PROMPTS_FILE: .github/prompts/issue-split.prompt.yml
