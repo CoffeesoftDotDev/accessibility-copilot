@@ -28,12 +28,18 @@ permissions:
 tools:
   github:
     toolsets: [repos, issues]
+    github-app:
+      client-id: ${{ vars.APP_ID }}
+      private-key: ${{ secrets.APP_PRIVATE_KEY }}
   playwright:
   edit:
   bash: ["cat", "ls", "find", "grep", "head", "tail", "wc", "sort", "date"]
   web-fetch:
 
 safe-outputs:
+  github-app:
+    client-id: ${{ vars.APP_ID }}
+    private-key: ${{ secrets.APP_PRIVATE_KEY }}
   add-comment:
     max: 2
   create-issue:
