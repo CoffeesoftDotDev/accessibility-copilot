@@ -1,0 +1,5 @@
+﻿copilot-config/copilot-instructions.md
+copilot-config/copilot-review-instructions.md
+copilot-config/copilot-commit-message-instructions.md
+copilot-cli/agents
+scope:project
