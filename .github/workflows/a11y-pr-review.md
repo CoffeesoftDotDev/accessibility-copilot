@@ -51,14 +51,8 @@ You are a neuro-inclusive accessibility auditor. Your job is to review the pull 
 
 ## Context & References
 
-Read these files from the repository for your audit framework:
-- `.github/instructions/a11y.instructions.md` — the canonical accessibility specification (source of truth)
-- `.github/resources/a11y-rules.md` — detailed TDAH and Autism accessibility rules
-- `.github/prompts/a11y-neuro-uber-flow.prompt.md` — the audit orchestration guide (sections A→L)
-- `.github/prompts/a11y-neuro-audit-static-code.prompt.md` — static code audit criteria
-- `.github/prompts/a11y-neuro-audit-content.prompt.md` — content & microcopy audit criteria
-- `.github/prompts/a11y-neuro-audit-cognitive-flow.prompt.md` — cognitive flow audit criteria
-- `.github/prompts/a11y-neuro-audit-overview.prompt.md` — overview & risk matrix criteria
+Read this file from the repository — it is the **single source of truth** for your audit:
+- `.github/instructions/a11y.instructions.md` — comprehensive accessibility standards (WCAG 2.2 AA, 38+ anti-patterns with severity, detection, corrective code, legal context, WAI-ARIA patterns)
 
 ## Step 1: Understand the PR
 
@@ -104,7 +98,7 @@ Determine if a preview/deployment URL is available by checking:
 - Navigate to the URL using Playwright
 - Test 3-5 core user flows affected by the PR changes
 - Capture screenshots of each interaction
-- Check for accessibility issues against the rules in `.github/resources/a11y-rules.md`
+- Check for accessibility issues against the rules in `.github/instructions/a11y.instructions.md`
 - Test keyboard navigation through the changed flows
 - Verify focus management, motion controls, and error states
 

@@ -59,15 +59,8 @@ You are a neuro-inclusive accessibility auditor. Perform a comprehensive audit o
 
 ## Context & References
 
-Read these files for your audit framework:
-- `.github/instructions/a11y.instructions.md` — canonical accessibility specification
-- `.github/resources/a11y-rules.md` — TDAH and Autism accessibility rules
-- `.github/prompts/a11y-neuro-uber-flow.prompt.md` — audit orchestration (sections A→L)
-- `.github/prompts/a11y-neuro-audit-static-code.prompt.md` — static code audit criteria
-- `.github/prompts/a11y-neuro-audit-content.prompt.md` — content & microcopy criteria
-- `.github/prompts/a11y-neuro-audit-cognitive-flow.prompt.md` — cognitive flow criteria
-- `.github/prompts/a11y-neuro-audit-overview.prompt.md` — overview & risk matrix criteria
-- `.github/prompts/a11y-backlog.prompt.md` — backlog & issue card generation criteria
+Read this file from the repository — it is the **single source of truth** for your audit:
+- `.github/instructions/a11y.instructions.md` — comprehensive accessibility standards (WCAG 2.2 AA, 38+ anti-patterns with severity, detection, corrective code, legal context, WAI-ARIA patterns)
 
 ## Configuration
 
@@ -78,7 +71,7 @@ Read these files for your audit framework:
 
 ## Audit Sequence
 
-Follow the orchestration sequence from the uber-flow prompt:
+Follow this audit sequence based on `.github/instructions/a11y.instructions.md`:
 
 ### Phase 1: Static Code Audit
 Scan the target scope for structural & semantic deviations:
