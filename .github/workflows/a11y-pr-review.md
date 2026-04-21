@@ -31,6 +31,8 @@ safe-outputs:
     max: 15
     group: true
     close-older-issues: true
+  update-issue:
+    max: 15
   add-labels:
     allowed: [accessibility, neurodiversity-check, a11y-reviewed]
     max: 3

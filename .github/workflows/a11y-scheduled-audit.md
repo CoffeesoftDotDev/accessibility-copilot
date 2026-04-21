@@ -34,12 +34,16 @@ tools:
   web-fetch:
 
 safe-outputs:
+  add-comment:
+    max: 2
   create-issue:
     title-prefix: "[A11Y Audit] "
     labels: [neurodiversity-check, accessibility, audit-report]
     max: 20
     group: true
     close-older-issues: true
+  update-issue:
+    max: 20
 ---
 
 # Full Repository Neuro-Inclusive Accessibility Audit
