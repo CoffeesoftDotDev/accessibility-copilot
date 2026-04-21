@@ -3,7 +3,7 @@
     <div class="checkout-panel">
       <div class="checkout-header">
         <h2>Checkout</h2>
-        <button class="close-btn" @click="closeCheckout">×</button>
+        <span class="close-btn" @click="closeCheckout" style="cursor: pointer;">×</span>
       </div>
       
       <div class="checkout-content">
@@ -24,32 +24,29 @@
           
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">First Name</label>
               <input 
-                id="firstName" 
                 v-model="customerInfo.firstName" 
                 type="text" 
+                placeholder="First Name"
                 required 
               />
             </div>
             
             <div class="form-group">
-              <label for="lastName">Last Name</label>
               <input 
-                id="lastName" 
                 v-model="customerInfo.lastName" 
                 type="text" 
+                placeholder="Last Name"
                 required 
               />
             </div>
           </div>
           
           <div class="form-group">
-            <label for="email">Email</label>
             <input 
-              id="email" 
               v-model="customerInfo.email" 
-              type="email" 
+              type="text" 
+              placeholder="Email"
               required 
             />
           </div>
@@ -57,43 +54,39 @@
           <h3>Shipping Address</h3>
           
           <div class="form-group">
-            <label for="address">Address</label>
             <input 
-              id="address" 
               v-model="customerInfo.address" 
               type="text" 
+              placeholder="Address"
               required 
             />
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="city">City</label>
               <input 
-                id="city" 
                 v-model="customerInfo.city" 
                 type="text" 
+                placeholder="City"
                 required 
               />
             </div>
             
             <div class="form-group">
-              <label for="postalCode">Postal Code</label>
               <input 
-                id="postalCode" 
                 v-model="customerInfo.postalCode" 
                 type="text" 
+                placeholder="Postal Code"
                 required 
               />
             </div>
           </div>
           
           <div class="form-group">
-            <label for="country">Country</label>
             <input 
-              id="country" 
               v-model="customerInfo.country" 
               type="text" 
+              placeholder="Country"
               required 
             />
           </div>
@@ -101,35 +94,24 @@
           <h3>Payment Method</h3>
           
           <div class="payment-options">
-            <div class="payment-option">
-              <input 
-                id="creditCard" 
-                type="radio" 
-                value="credit-card" 
-                v-model="customerInfo.paymentMethod" 
-                required
-              />
-              <label for="creditCard">Credit Card</label>
+            <div class="payment-option" @click="customerInfo.paymentMethod = 'credit-card'" 
+                 :style="{ background: customerInfo.paymentMethod === 'credit-card' ? '#4a6cf7' : '#eee', color: customerInfo.paymentMethod === 'credit-card' ? 'white' : '#333' }">
+              💳 Credit Card
             </div>
             
-            <div class="payment-option">
-              <input 
-                id="paypal" 
-                type="radio" 
-                value="paypal" 
-                v-model="customerInfo.paymentMethod"
-              />
-              <label for="paypal">PayPal</label>
+            <div class="payment-option" @click="customerInfo.paymentMethod = 'paypal'"
+                 :style="{ background: customerInfo.paymentMethod === 'paypal' ? '#4a6cf7' : '#eee', color: customerInfo.paymentMethod === 'paypal' ? 'white' : '#333' }">
+              🅿️ PayPal
             </div>
           </div>
           
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="goBackToCart">
+            <div class="btn btn-secondary" @click="goBackToCart">
               Back to Cart
-            </button>
-            <button type="submit" class="btn btn-primary">
+            </div>
+            <div class="btn btn-primary" @click="submitOrder">
               Place Order
-            </button>
+            </div>
           </div>
         </form>
       </div>

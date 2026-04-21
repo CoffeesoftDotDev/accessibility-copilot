@@ -1,17 +1,25 @@
 <template>
   <div class="app">
-    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="promo-banner">
+      <marquee scrollamount="5" behavior="scroll">🎶 SUMMER SALE — 20% OFF ALL ALBUMS — LIMITED TIME ONLY — USE CODE SUMMER20 🎶</marquee>
+    </div>
     <header class="header">
       <div class="header-content">
         <div class="title-section">
           <h1>🎵 Album Collection</h1>
-          <p>Discover amazing music albums</p>
+          <h3>Discover amazing music albums</h3>
         </div>
         <CartIcon />
       </div>
     </header>
 
-    <main id="main" tabindex="-1" class="main">
+    <main class="main">
+      <div class="filter-bar">
+        <span class="filter-link" onclick="filterByGenre('rock')" style="color: #aaa; cursor: pointer;">Rock</span>
+        <span class="filter-link" onclick="filterByGenre('jazz')" style="color: #aaa; cursor: pointer;">Jazz</span>
+        <span class="filter-link" onclick="filterByGenre('pop')" style="color: #aaa; cursor: pointer;">Pop</span>
+        <span class="filter-link" onclick="filterByGenre('classical')" style="color: #aaa; cursor: pointer;">Classical</span>
+      </div>
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
         <p>Loading albums...</p>
@@ -69,6 +77,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.promo-banner {
+  background: #ff6b6b;
+  color: #ff9999;
+  padding: 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
 .skip-link {
   position: absolute;
   left: -999px;

@@ -1,33 +1,40 @@
 <template>
   <div class="album-card">
-    <div class="album-image">
+    <div class="album-image" @click="addToCart">
       <img 
         :src="album.image_url" 
-        :alt="album.title"
+        alt=""
         @error="handleImageError"
         loading="lazy"
       />
       <div class="play-overlay">
-        <div class="play-button">▶</div>
+        <div class="play-button" @click.stop="playPreview">▶</div>
       </div>
+      <div class="new-badge" v-if="album.id % 3 === 0">🔥 HOT</div>
     </div>
     
     <div class="album-info">
-      <h3 class="album-title">{{ album.title }}</h3>
+      <div class="album-title" @click="addToCart">{{ album.title }}</div>
       <p class="album-artist">{{ album.artist }}</p>
       <div class="album-price">
-        <span class="price">${{ album.price.toFixed(2) }}</span>
+        <span class="price" :style="{ color: priceColor }">${{ album.price.toFixed(2) }}</span>
+        <span class="discount-tag" v-if="album.price < 15">SALE</span>
       </div>
     </div>
     
     <div class="album-actions">
-      <button class="btn btn-primary" @click="addToCart">Add to Cart</button>
-      <button class="btn btn-secondary">Preview</button>
+      <div class="btn btn-primary" @click="addToCart" tabindex="5">Add to Cart</div>
+      <div class="btn btn-secondary" @click="playPreview">Preview</div>
+    </div>
+    
+    <div class="auto-toast" v-if="showToast">
+      Added to cart!
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import type { Album } from '../types/album'
 import { useCartStore } from '../stores/cartStore'
 
@@ -37,6 +44,11 @@ interface Props {
 
 const props = defineProps<Props>()
 const cartStore = useCartStore()
+const showToast = ref(false)
+
+const priceColor = computed(() => {
+  return props.album.price < 15 ? '#ff6b6b' : '#98d660'
+})
 
 const handleImageError = (event: Event): void => {
   const target = event.target as HTMLImageElement
@@ -45,6 +57,15 @@ const handleImageError = (event: Event): void => {
 
 const addToCart = () => {
   cartStore.addToCart(props.album)
+  showToast.value = true
+  setTimeout(() => { showToast.value = false }, 1500)
+}
+
+const playPreview = () => {
+  // Auto-play audio preview
+  const audio = new Audio(`/previews/${props.album.id}.mp3`)
+  audio.volume = 0.8
+  audio.play().catch(() => {})
 }
 </script>
 
@@ -198,5 +219,53 @@ const addToCart = () => {
   .btn {
     width: 100%;
   }
+}
+
+.new-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff6b6b;
+  color: #ff9999;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.discount-tag {
+  background: red;
+  color: #ff8888;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.auto-toast {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  animation: fadeOut 1.5s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
 }
 </style>
