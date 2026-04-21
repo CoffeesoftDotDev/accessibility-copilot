@@ -232,7 +232,122 @@ Append rows (no deletions):
 Embed persona constraints explicitly:
 "Return deterministic section order; chunk instructions; provide literal labels; add change summary; offer optional focus mode variant." Reference checklist (§17) in acceptance criteria for generated artifacts.
 
-## 24. Module References
+## 24. WCAG 2.2 Official Reference
+
+Official documentation: **[Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/WAI/standards-guidelines/wcag/fr)** | [Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/?versions=2.2)
+
+This project targets **Level AA** conformance. The table below lists all WCAG 2.2 success criteria. Criteria marked ★ are new in 2.2; criteria marked ⊕ were added in 2.1.
+
+### Principle 1 — Perceivable
+
+| # | Success Criterion | Level | Summary |
+|---|---|---|---|
+| 1.1.1 | Non-text Content | A | All non-text content has a text alternative |
+| 1.2.1 | Audio-only / Video-only (Prerecorded) | A | Alternative provided for prerecorded audio/video-only |
+| 1.2.2 | Captions (Prerecorded) | A | Captions for all prerecorded audio in synchronized media |
+| 1.2.3 | Audio Description or Media Alternative | A | Audio description or text alternative for prerecorded video |
+| 1.2.4 | Captions (Live) | AA | Captions for live audio content |
+| 1.2.5 | Audio Description (Prerecorded) | AA | Audio description for all prerecorded video |
+| 1.2.6 | Sign Language (Prerecorded) | AAA | Sign language interpretation for prerecorded audio |
+| 1.2.7 | Extended Audio Description | AAA | Extended audio description when pauses are insufficient |
+| 1.2.8 | Media Alternative (Prerecorded) | AAA | Text alternative for all prerecorded synchronized media |
+| 1.2.9 | Audio-only (Live) | AAA | Alternative for live audio-only content |
+| 1.3.1 | Info and Relationships | A | Structure and relationships are programmatically determinable |
+| 1.3.2 | Meaningful Sequence | A | Correct reading sequence is programmatically determinable |
+| 1.3.3 | Sensory Characteristics | A | Instructions do not rely solely on shape, color, size, or sound |
+| 1.3.4 | Orientation ⊕ | AA | Content not restricted to single display orientation |
+| 1.3.5 | Identify Input Purpose ⊕ | AA | Input field purpose is programmatically determinable |
+| 1.3.6 | Identify Purpose ⊕ | AAA | Purpose of UI components, icons, and regions is determinable |
+| 1.4.1 | Use of Color | A | Color is not the only visual means of conveying information |
+| 1.4.2 | Audio Control | A | Mechanism to pause/stop/control auto-playing audio (>3s) |
+| 1.4.3 | Contrast (Minimum) | AA | Text contrast ratio ≥4.5:1 (≥3:1 for large text) |
+| 1.4.4 | Resize Text | AA | Text resizable up to 200% without loss of functionality |
+| 1.4.5 | Images of Text | AA | Use real text instead of images of text |
+| 1.4.6 | Contrast (Enhanced) | AAA | Text contrast ratio ≥7:1 (≥4.5:1 for large text) |
+| 1.4.7 | Low or No Background Audio | AAA | Background audio ≥20dB lower than foreground speech |
+| 1.4.8 | Visual Presentation | AAA | Configurable colors, width ≤80ch, no justification, line spacing |
+| 1.4.9 | Images of Text (No Exception) | AAA | Images of text only for decoration or essential presentation |
+| 1.4.10 | Reflow ⊕ | AA | No two-dimensional scrolling at 320px width / 256px height |
+| 1.4.11 | Non-text Contrast ⊕ | AA | UI components and graphics have ≥3:1 contrast ratio |
+| 1.4.12 | Text Spacing ⊕ | AA | No loss of content when overriding text spacing properties |
+| 1.4.13 | Content on Hover or Focus ⊕ | AA | Additional content is dismissible, hoverable, and persistent |
+
+### Principle 2 — Operable
+
+| # | Success Criterion | Level | Summary |
+|---|---|---|---|
+| 2.1.1 | Keyboard | A | All functionality operable via keyboard |
+| 2.1.2 | No Keyboard Trap | A | Focus can always be moved away using keyboard |
+| 2.1.3 | Keyboard (No Exception) | AAA | All functionality via keyboard, no exceptions |
+| 2.1.4 | Character Key Shortcuts ⊕ | A | Single-character shortcuts can be turned off or remapped |
+| 2.2.1 | Timing Adjustable | A | Time limits can be turned off, adjusted, or extended |
+| 2.2.2 | Pause, Stop, Hide | A | Moving/blinking/scrolling content can be paused or stopped |
+| 2.2.3 | No Timing | AAA | Timing is not essential (except real-time events) |
+| 2.2.4 | Interruptions | AAA | Interruptions can be postponed or suppressed |
+| 2.2.5 | Re-authenticating | AAA | Activity continues without data loss after re-authentication |
+| 2.2.6 | Timeouts ⊕ | AAA | Users warned of inactivity timeout that causes data loss |
+| 2.3.1 | Three Flashes or Below Threshold | A | No content flashes more than 3 times/second |
+| 2.3.2 | Three Flashes | AAA | No content flashes more than 3 times/second (strict) |
+| 2.3.3 | Animation from Interactions ⊕ | AAA | Motion animation from interactions can be disabled |
+| 2.4.1 | Bypass Blocks | A | Mechanism to bypass repeated content blocks |
+| 2.4.2 | Page Titled | A | Pages have descriptive titles |
+| 2.4.3 | Focus Order | A | Focus order preserves meaning and operability |
+| 2.4.4 | Link Purpose (In Context) | A | Link purpose determinable from text or context |
+| 2.4.5 | Multiple Ways | AA | Multiple ways to locate a page within a set |
+| 2.4.6 | Headings and Labels | AA | Headings and labels describe topic or purpose |
+| 2.4.7 | Focus Visible | AA | Keyboard focus indicator is visible |
+| 2.4.8 | Location | AAA | User's location within a set of pages is available |
+| 2.4.9 | Link Purpose (Link Only) | AAA | Link purpose determinable from link text alone |
+| 2.4.10 | Section Headings | AAA | Section headings organize the content |
+| 2.4.11 | Focus Not Obscured (Minimum) ★ | AA | Focused component not entirely hidden by author content |
+| 2.4.12 | Focus Not Obscured (Enhanced) ★ | AAA | No part of focused component hidden by author content |
+| 2.4.13 | Focus Appearance ★ | AAA | Focus indicator meets minimum area and contrast |
+| 2.5.1 | Pointer Gestures ⊕ | A | Multipoint gestures have single-pointer alternative |
+| 2.5.2 | Pointer Cancellation ⊕ | A | Single-pointer functions use up-event or allow abort/undo |
+| 2.5.3 | Label in Name ⊕ | A | Accessible name contains the visible label text |
+| 2.5.4 | Motion Actuation ⊕ | A | Motion-operated functions have UI alternative |
+| 2.5.5 | Target Size (Enhanced) ⊕ | AAA | Pointer targets ≥44×44 CSS pixels |
+| 2.5.6 | Concurrent Input Mechanisms ⊕ | AAA | Input modalities not restricted |
+| 2.5.7 | Dragging Movements ★ | AA | Dragging has single-pointer alternative |
+| 2.5.8 | Target Size (Minimum) ★ | AA | Pointer targets ≥24×24 CSS pixels (with spacing rules) |
+
+### Principle 3 — Understandable
+
+| # | Success Criterion | Level | Summary |
+|---|---|---|---|
+| 3.1.1 | Language of Page | A | Default language programmatically determinable |
+| 3.1.2 | Language of Parts | AA | Language of passages/phrases programmatically determinable |
+| 3.1.3 | Unusual Words | AAA | Mechanism to identify definitions of jargon/idioms |
+| 3.1.4 | Abbreviations | AAA | Mechanism for expanded form of abbreviations |
+| 3.1.5 | Reading Level | AAA | Supplemental content for advanced reading level text |
+| 3.1.6 | Pronunciation | AAA | Mechanism to identify pronunciation of ambiguous words |
+| 3.2.1 | On Focus | A | Receiving focus does not initiate a change of context |
+| 3.2.2 | On Input | A | Changing a setting does not auto-change context without warning |
+| 3.2.3 | Consistent Navigation | AA | Repeated navigation in same relative order |
+| 3.2.4 | Consistent Identification | AA | Same functionality identified consistently |
+| 3.2.5 | Change on Request | AAA | Context changes only by user request |
+| 3.2.6 | Consistent Help ★ | A | Help mechanisms in consistent location across pages |
+| 3.3.1 | Error Identification | A | Errors automatically identified and described in text |
+| 3.3.2 | Labels or Instructions | A | Labels/instructions provided for user input |
+| 3.3.3 | Error Suggestion | AA | Correction suggestions provided when errors detected |
+| 3.3.4 | Error Prevention (Legal, Financial, Data) | AA | Submissions are reversible, checked, or confirmable |
+| 3.3.5 | Help | AAA | Context-sensitive help is available |
+| 3.3.6 | Error Prevention (All) | AAA | All submissions are reversible, checked, or confirmable |
+| 3.3.7 | Redundant Entry ★ | A | Previously entered info auto-populated or selectable |
+| 3.3.8 | Accessible Authentication (Minimum) ★ | AA | No cognitive function test required for authentication |
+| 3.3.9 | Accessible Authentication (Enhanced) ★ | AAA | Stricter: no object recognition or personal content tests |
+
+### Principle 4 — Robust
+
+| # | Success Criterion | Level | Summary |
+|---|---|---|---|
+| 4.1.1 | Parsing | A | Complete tags, proper nesting, unique IDs (always satisfied in HTML) |
+| 4.1.2 | Name, Role, Value | A | Name and role programmatically determinable for all UI components |
+| 4.1.3 | Status Messages ⊕ | AA | Status messages determinable by AT without receiving focus |
+
+> **Legend:** ★ = New in WCAG 2.2 | ⊕ = Added in WCAG 2.1 | Unmarked = WCAG 2.0 original
+
+## 25. Module References
 | Module | Status |
 |--------|--------|
 | modules/user-profiles.md | Active (v1.1) |
