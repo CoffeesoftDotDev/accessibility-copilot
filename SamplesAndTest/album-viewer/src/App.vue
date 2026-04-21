@@ -1,25 +1,23 @@
 <template>
   <div class="app">
-    <a href="#main" class="skip-link">Skip to main content</a>
-    <header class="header">
+    <div class="header">
       <div class="header-content">
         <div class="title-section">
-          <h1>🎵 Album Collection</h1>
-          <p>Discover amazing music albums</p>
+          <div class="app-title">🎵 Album Collection</div>
+          <div class="app-subtitle">Discover amazing music albums</div>
         </div>
         <CartIcon />
       </div>
-    </header>
+    </div>
 
-    <main id="main" tabindex="-1" class="main">
+    <div class="main">
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
-        <p>Loading albums...</p>
       </div>
 
       <div v-else-if="error" class="error">
-        <p>{{ error }}</p>
-        <button @click="fetchAlbums" class="retry-btn">Try Again</button>
+        <div style="color: #fcc;">{{ error }}</div>
+        <div @click="fetchAlbums" class="retry-btn">Retry</div>
       </div>
 
       <div v-else class="albums-grid">
@@ -30,11 +28,15 @@
           @preview="openPreview"
         />
       </div>
-    </main>
+    </div>
     
     <CartOverlay />
     <CheckoutForm />
     <AlbumPreview :album="previewAlbum" @close="closePreview" />
+
+    <div v-if="toast" class="toast" :class="{ 'toast-fade': toastFading }">
+      {{ toast }}
+    </div>
   </div>
 </template>
 
@@ -52,6 +54,8 @@ const albums = ref<Album[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
 const previewAlbum = ref<Album | null>(null)
+const toast = ref<string | null>(null)
+const toastFading = ref(false)
 
 const openPreview = (album: Album) => {
   previewAlbum.value = album
@@ -67,8 +71,12 @@ const fetchAlbums = async (): Promise<void> => {
     error.value = null
     const data = await fetchMockAlbums()
     albums.value = data
+    toast.value = 'Albums loaded!'
+    toastFading.value = false
+    setTimeout(() => { toastFading.value = true }, 1500)
+    setTimeout(() => { toast.value = null }, 2000)
   } catch (err) {
-    error.value = 'Failed to load albums.'
+    error.value = 'Something went wrong.'
     console.error('Error fetching albums:', err)
   } finally {
     loading.value = false
@@ -81,25 +89,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.skip-link {
-  position: absolute;
-  left: -999px;
-  top: 0;
-  z-index: 1000;
-  padding: 0.5rem;
-  background: #fff;
-  color: #000;
-  text-decoration: none;
-  border: 2px solid #000;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-.skip-link:focus {
-  left: 0.5rem;
-  outline: 2px solid #000;
-}
-
 .app {
   min-height: 100vh;
   padding: 2rem;
@@ -119,19 +108,15 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.title-section {
-  text-align: left;
-}
-
-.header h1 {
+.app-title {
   font-size: 3rem;
-  margin-bottom: 0.5rem;
+  font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.header p {
+.app-subtitle {
   font-size: 1.2rem;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .main {
@@ -145,7 +130,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  color: white;
 }
 
 .spinner {
@@ -154,8 +138,7 @@ onMounted(() => {
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-top: 4px solid white;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  animation: spin 0.3s linear infinite;
 }
 
 @keyframes spin {
@@ -166,28 +149,18 @@ onMounted(() => {
 .error {
   text-align: center;
   padding: 4rem;
-  color: white;
-}
-
-.error p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
 }
 
 .retry-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid white;
+  display: inline-block;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.75rem 2rem;
   border-radius: 25px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.retry-btn:hover {
-  background: white;
-  color: #667eea;
+  font-size: 0.8rem;
 }
 
 .albums-grid {
@@ -197,18 +170,21 @@ onMounted(() => {
   padding: 1rem;
 }
 
-@media (max-width: 768px) {
-  .app {
-    padding: 1rem;
-  }
-  
-  .header h1 {
-    font-size: 2rem;
-  }
-  
-  .albums-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #aaa;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  z-index: 9999;
+  transition: opacity 0.5s;
+}
+
+.toast-fade {
+  opacity: 0;
 }
 </style>

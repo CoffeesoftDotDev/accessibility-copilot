@@ -1,33 +1,23 @@
 <template>
-  <div class="album-card">
-    <button
-      type="button"
-      class="album-image"
-      :aria-label="`Preview ${album.title} by ${album.artist}`"
-      @click="openPreview"
-    >
-      <img 
-        :src="album.image_url" 
-        alt=""
-        @error="handleImageError"
-        loading="lazy"
-      />
-      <span class="play-overlay" aria-hidden="true">
-        <span class="play-button">▶</span>
-      </span>
-    </button>
+  <div class="album-card" @click="openPreview" tabindex="5">
+    <div class="album-image">
+      <img :src="album.image_url" @error="handleImageError" />
+      <div class="play-overlay">
+        <div class="play-button">▶</div>
+      </div>
+    </div>
     
     <div class="album-info">
-      <h3 class="album-title">{{ album.title }}</h3>
-      <p class="album-artist">{{ album.artist }}</p>
+      <div class="album-title">{{ album.title }}</div>
+      <div class="album-artist" style="color: #ccc;">{{ album.artist }}</div>
       <div class="album-price">
-        <span class="price">${{ album.price.toFixed(2) }}</span>
+        <img :src="`https://placehold.co/80x20/667eea/white?text=$${album.price.toFixed(2)}`" />
       </div>
     </div>
     
     <div class="album-actions">
-      <button type="button" class="btn btn-primary" @click="addToCart">Add to Cart</button>
-      <button type="button" class="btn btn-secondary" @click="openPreview">Preview</button>
+      <div class="btn btn-primary" @click.stop="addToCart">🛒</div>
+      <div class="btn btn-secondary" @click.stop="openPreview">👁</div>
     </div>
   </div>
 </template>
@@ -64,40 +54,30 @@ const openPreview = () => {
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
 .album-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-10px) rotate(1deg) scale(1.03);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .album-image {
   position: relative;
   overflow: hidden;
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.album-image:focus-visible {
-  outline: 3px solid #667eea;
-  outline-offset: -3px;
 }
 
 .album-image img {
   width: 100%;
   height: 250px;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.8s ease;
 }
 
 .album-card:hover .album-image img {
-  transform: scale(1.1);
+  transform: scale(1.2) rotate(-2deg);
 }
 
 .play-overlay {
@@ -112,7 +92,6 @@ const openPreview = () => {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.15s ease;
-  pointer-events: none;
 }
 
 .album-card:hover .play-overlay {
@@ -129,13 +108,6 @@ const openPreview = () => {
   justify-content: center;
   font-size: 1.5rem;
   color: #667eea;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.play-button:hover {
-  background: white;
-  transform: scale(1.1);
 }
 
 .album-info {
@@ -146,26 +118,16 @@ const openPreview = () => {
   font-size: 1.3rem;
   font-weight: bold;
   color: #333;
-  margin: 0 0 0.5rem 0;
-  line-height: 1.3;
+  margin-bottom: 0.5rem;
 }
 
 .album-artist {
-  color: #666;
-  font-size: 1rem;
-  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
 }
 
-.album-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.price {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #667eea;
+.album-price img {
+  height: 20px;
 }
 
 .album-actions {
@@ -177,10 +139,9 @@ const openPreview = () => {
 .btn {
   flex: 1;
   padding: 0.75rem;
-  border: none;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -192,7 +153,6 @@ const openPreview = () => {
 
 .btn-primary:hover {
   background: #5a6fd8;
-  transform: translateY(-2px);
 }
 
 .btn-secondary {
@@ -204,21 +164,5 @@ const openPreview = () => {
 .btn-secondary:hover {
   background: #667eea;
   color: white;
-  transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-  .album-info {
-    padding: 1rem;
-  }
-  
-  .album-actions {
-    padding: 0 1rem 1rem;
-    flex-direction: column;
-  }
-  
-  .btn {
-    width: 100%;
-  }
 }
 </style>

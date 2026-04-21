@@ -1,343 +1,266 @@
 <template>
-  <div class="checkout-overlay" v-if="isCheckoutOpen">
+  <div v-if="isCheckoutOpen" class="checkout-overlay">
     <div class="checkout-panel">
       <div class="checkout-header">
-        <h2>Checkout</h2>
-        <button class="close-btn" @click="closeCheckout">×</button>
+        <div style="font-weight: bold; font-size: 1.2rem;">Checkout</div>
+        <div class="close-btn" @click="closeCheckout">×</div>
       </div>
-      
-      <div class="checkout-content">
-        <div class="order-summary">
-          <h3>Order Summary</h3>
-          <div v-for="item in cartItems" :key="item.album.id" class="summary-item">
-            <span>{{ item.album.title }} (x{{ item.quantity }})</span>
-            <span>${{ (item.album.price * item.quantity).toFixed(2) }}</span>
-          </div>
-          <div class="total-line">
-            <span>Total</span>
-            <span>${{ formattedTotalPrice }}</span>
+
+      <div v-if="submitted" class="success-message">
+        <div style="font-size: 3rem;">✅</div>
+        <div style="font-size: 1.1rem; font-weight: bold;">Done!</div>
+        <div style="color: #bbb; font-size: 0.9rem;">Check your email</div>
+      </div>
+
+      <div v-else class="checkout-form-container">
+        <div v-if="timeRemaining <= 30" class="timer-banner" :style="{ background: timeRemaining <= 10 ? 'red' : 'orange', color: 'white' }">
+          ⚠ Session expires in {{ timeRemaining }}s
+        </div>
+
+        <div class="form-section">
+          <input type="text" v-model="form.name" placeholder="Full Name" class="form-input" />
+          <input type="email" v-model="form.email" placeholder="Email Address" class="form-input" />
+          <input type="text" v-model="form.address" placeholder="Shipping Address" class="form-input" />
+          <input type="text" v-model="form.city" placeholder="City" class="form-input" />
+          <input type="text" v-model="form.zip" placeholder="ZIP Code" class="form-input" />
+        </div>
+
+        <div class="form-section">
+          <div style="font-weight: bold; margin-bottom: 0.5rem; color: #888;">Payment</div>
+          <input type="text" v-model="form.cardNumber" placeholder="Card Number" class="form-input" maxlength="19" />
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" v-model="form.expiry" placeholder="MM/YY" class="form-input" style="flex: 1;" />
+            <input type="text" v-model="form.cvv" placeholder="CVV" class="form-input" style="flex: 1;" />
           </div>
         </div>
-        
-        <form @submit.prevent="submitOrder" class="checkout-form">
-          <h3>Customer Information</h3>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstName">First Name</label>
-              <input 
-                id="firstName" 
-                v-model="customerInfo.firstName" 
-                type="text" 
-                required 
-              />
-            </div>
-            
-            <div class="form-group">
-              <label for="lastName">Last Name</label>
-              <input 
-                id="lastName" 
-                v-model="customerInfo.lastName" 
-                type="text" 
-                required 
-              />
-            </div>
+
+        <div class="order-summary">
+          <div v-for="item in cartItems" :key="item.album.id" class="summary-item">
+            <span>{{ item.album.title }} × {{ item.quantity }}</span>
+            <span>${{ (item.album.price * item.quantity).toFixed(2) }}</span>
           </div>
-          
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input 
-              id="email" 
-              v-model="customerInfo.email" 
-              type="email" 
-              required 
-            />
+          <div class="summary-total">
+            <span>Total</span>
+            <span style="color: #667eea;">${{ formattedTotalPrice }}</span>
           </div>
-          
-          <h3>Shipping Address</h3>
-          
-          <div class="form-group">
-            <label for="address">Address</label>
-            <input 
-              id="address" 
-              v-model="customerInfo.address" 
-              type="text" 
-              required 
-            />
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="city">City</label>
-              <input 
-                id="city" 
-                v-model="customerInfo.city" 
-                type="text" 
-                required 
-              />
-            </div>
-            
-            <div class="form-group">
-              <label for="postalCode">Postal Code</label>
-              <input 
-                id="postalCode" 
-                v-model="customerInfo.postalCode" 
-                type="text" 
-                required 
-              />
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="country">Country</label>
-            <input 
-              id="country" 
-              v-model="customerInfo.country" 
-              type="text" 
-              required 
-            />
-          </div>
-          
-          <h3>Payment Method</h3>
-          
-          <div class="payment-options">
-            <div class="payment-option">
-              <input 
-                id="creditCard" 
-                type="radio" 
-                value="credit-card" 
-                v-model="customerInfo.paymentMethod" 
-                required
-              />
-              <label for="creditCard">Credit Card</label>
-            </div>
-            
-            <div class="payment-option">
-              <input 
-                id="paypal" 
-                type="radio" 
-                value="paypal" 
-                v-model="customerInfo.paymentMethod"
-              />
-              <label for="paypal">PayPal</label>
-            </div>
-          </div>
-          
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="goBackToCart">
-              Back to Cart
-            </button>
-            <button type="submit" class="btn btn-primary">
-              Place Order
-            </button>
-          </div>
-        </form>
+        </div>
+
+        <div class="btn btn-primary" @click="submitOrder">
+          Pay ${{ formattedTotalPrice }}
+        </div>
+
+        <div v-if="formError" class="form-error">
+          {{ formError }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useCartStore } from '../stores/cartStore'
-import type { CustomerInfo } from '../stores/cartStore'
 
 const cartStore = useCartStore()
 
-const customerInfo = ref<CustomerInfo>({
-  firstName: '',
-  lastName: '',
-  email: '',
-  address: '',
-  city: '',
-  postalCode: '',
-  country: '',
-  paymentMethod: 'credit-card'
-})
-
-// Computed properties
 const isCheckoutOpen = computed(() => cartStore.isCheckoutOpen)
 const cartItems = computed(() => cartStore.items)
 const formattedTotalPrice = computed(() => cartStore.formattedTotalPrice)
 
-// Methods
+const submitted = ref(false)
+const formError = ref('')
+const timeRemaining = ref(120)
+let timerInterval: number | null = null
+
+const form = reactive({
+  name: '',
+  email: '',
+  address: '',
+  city: '',
+  zip: '',
+  cardNumber: '',
+  expiry: '',
+  cvv: '',
+})
+
+watch(isCheckoutOpen, (val) => {
+  if (val) {
+    submitted.value = false
+    formError.value = ''
+    timeRemaining.value = 120
+    timerInterval = window.setInterval(() => {
+      timeRemaining.value -= 1
+      if (timeRemaining.value <= 0) {
+        formError.value = 'Session expired. Try again.'
+        if (timerInterval) clearInterval(timerInterval)
+      }
+    }, 1000)
+  } else {
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+  }
+})
+
 const closeCheckout = () => {
   cartStore.closeCheckout()
 }
 
-const goBackToCart = () => {
-  cartStore.closeCheckout()
-  cartStore.toggleCart()
+const submitOrder = () => {
+  if (timeRemaining.value <= 0) {
+    formError.value = 'Session expired. Try again.'
+    return
+  }
+  if (!form.name || !form.email || !form.cardNumber) {
+    formError.value = 'Error. Check your info.'
+    return
+  }
+  formError.value = ''
+  submitted.value = true
+  if (timerInterval) clearInterval(timerInterval)
+  cartStore.clearCart()
 }
 
-const submitOrder = () => {
-  cartStore.saveCustomerInfo(customerInfo.value)
-  const success = cartStore.submitOrder()
-  
-  if (success) {
-    // You could show a success message or redirect the user
-    alert('Order placed successfully!')
-  }
-}
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+})
 </script>
 
 <style scoped>
 .checkout-overlay {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 20px;
+  justify-content: center;
+  padding: 1rem;
 }
 
 .checkout-panel {
-  background-color: white;
+  background: white;
+  border-radius: 16px;
   width: 100%;
-  max-width: 800px;
+  max-width: 480px;
   max-height: 90vh;
-  border-radius: 8px;
   overflow-y: auto;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .checkout-header {
-  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.25rem;
   border-bottom: 1px solid #eee;
 }
 
 .close-btn {
-  background: none;
-  border: none;
   font-size: 24px;
+  color: #ccc;
   cursor: pointer;
-  color: #555;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.checkout-content {
-  padding: 20px;
+.timer-banner {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.85rem;
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.checkout-form-container {
+  padding: 1.25rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-input {
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fafafa;
+}
+
+.form-input:focus {
+  border-color: #667eea;
 }
 
 .order-summary {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+  border-top: 1px solid #eee;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px dashed #ddd;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+  color: #666;
 }
 
-.total-line {
+.summary-total {
   display: flex;
   justify-content: space-between;
-  padding-top: 10px;
   font-weight: bold;
-  font-size: 18px;
-}
-
-.checkout-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-row {
-  display: flex;
-  gap: 15px;
-}
-
-.form-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  margin-bottom: 5px;
-  font-weight: 500;
-}
-
-input[type="text"],
-input[type="email"] {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.payment-options {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.payment-option {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
 }
 
 .btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  text-align: center;
 }
 
 .btn-primary {
-  background-color: #4a6cf7;
+  background: #667eea;
   color: white;
 }
 
-.btn-secondary {
-  background-color: #e0e0e0;
-  color: #333;
+.form-error {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: #fff3f3;
+  color: #c33;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
-.btn-primary:hover {
-  background-color: #3955d1;
-}
-
-.btn-secondary:hover {
-  background-color: #d0d0d0;
-}
-
-h3 {
-  margin-top: 25px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-@media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .checkout-panel {
-    max-width: 100%;
-  }
+.success-message {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>
