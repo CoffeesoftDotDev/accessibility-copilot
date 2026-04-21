@@ -1,16 +1,21 @@
 <template>
   <div class="album-card">
-    <div class="album-image">
+    <button
+      type="button"
+      class="album-image"
+      :aria-label="`Preview ${album.title} by ${album.artist}`"
+      @click="openPreview"
+    >
       <img 
         :src="album.image_url" 
-        :alt="album.title"
+        alt=""
         @error="handleImageError"
         loading="lazy"
       />
-      <div class="play-overlay">
-        <div class="play-button">▶</div>
-      </div>
-    </div>
+      <span class="play-overlay" aria-hidden="true">
+        <span class="play-button">▶</span>
+      </span>
+    </button>
     
     <div class="album-info">
       <h3 class="album-title">{{ album.title }}</h3>
@@ -21,8 +26,8 @@
     </div>
     
     <div class="album-actions">
-      <button class="btn btn-primary" @click="addToCart">Add to Cart</button>
-      <button class="btn btn-secondary">Preview</button>
+      <button type="button" class="btn btn-primary" @click="addToCart">Add to Cart</button>
+      <button type="button" class="btn btn-secondary" @click="openPreview">Preview</button>
     </div>
   </div>
 </template>
@@ -36,6 +41,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<{ (e: 'preview', album: Album): void }>()
 const cartStore = useCartStore()
 
 const handleImageError = (event: Event): void => {
@@ -45,6 +51,10 @@ const handleImageError = (event: Event): void => {
 
 const addToCart = () => {
   cartStore.addToCart(props.album)
+}
+
+const openPreview = () => {
+  emit('preview', props.album)
 }
 </script>
 
@@ -66,6 +76,17 @@ const addToCart = () => {
 .album-image {
   position: relative;
   overflow: hidden;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.album-image:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: -3px;
 }
 
 .album-image img {
@@ -90,7 +111,8 @@ const addToCart = () => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
 }
 
 .album-card:hover .play-overlay {

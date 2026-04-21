@@ -26,13 +26,15 @@
         <AlbumCard 
           v-for="album in albums" 
           :key="album.id" 
-          :album="album" 
+          :album="album"
+          @preview="openPreview"
         />
       </div>
     </main>
     
     <CartOverlay />
     <CheckoutForm />
+    <AlbumPreview :album="previewAlbum" @close="closePreview" />
   </div>
 </template>
 
@@ -40,6 +42,7 @@
 import { ref, onMounted } from 'vue'
 import { fetchAlbums as fetchMockAlbums } from './stores/mockAlbumService'
 import AlbumCard from './components/AlbumCard.vue'
+import AlbumPreview from './components/AlbumPreview.vue'
 import CartIcon from './components/CartIcon.vue'
 import CartOverlay from './components/CartOverlay.vue'
 import CheckoutForm from './components/CheckoutForm.vue'
@@ -48,6 +51,15 @@ import type { Album } from './types/album'
 const albums = ref<Album[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
+const previewAlbum = ref<Album | null>(null)
+
+const openPreview = (album: Album) => {
+  previewAlbum.value = album
+}
+
+const closePreview = () => {
+  previewAlbum.value = null
+}
 
 const fetchAlbums = async (): Promise<void> => {
   try {
