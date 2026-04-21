@@ -16,9 +16,10 @@ permissions:
 
 tools:
   github:
+    mode: remote
     toolsets: [repos, issues, pull_requests]
     github-app:
-      client-id: ${{ vars.APP_ID }}
+      app-id: ${{ vars.APP_ID }}
       private-key: ${{ secrets.APP_PRIVATE_KEY }}
   playwright:
   edit:
@@ -27,7 +28,7 @@ tools:
 
 safe-outputs:
   github-app:
-    client-id: ${{ vars.APP_ID }}
+    app-id: ${{ vars.APP_ID }}
     private-key: ${{ secrets.APP_PRIVATE_KEY }}
   add-comment:
     max: 2
