@@ -64,8 +64,8 @@ const error = ref<string | null>(null)
 const previewAlbum = ref<Album | null>(null)
 const toast = ref<string | null>(null)
 const toastFading = ref(false)
-let toastTimer: number | null = null
-let toastFadeTimer: number | null = null
+const toastTimer = ref<number | null>(null)
+const toastFadeTimer = ref<number | null>(null)
 
 const openPreview = (album: Album) => {
   previewAlbum.value = album
@@ -81,22 +81,24 @@ const showToast = (message: string, duration = 5000): void => {
   toast.value = message
   toastFading.value = false
 
-  if (toastTimer !== null) {
-    clearTimeout(toastTimer)
+  if (toastTimer.value !== null) {
+    clearTimeout(toastTimer.value)
   }
 
-  if (toastFadeTimer !== null) {
-    clearTimeout(toastFadeTimer)
+  if (toastFadeTimer.value !== null) {
+    clearTimeout(toastFadeTimer.value)
   }
 
-  toastFadeTimer = window.setTimeout(() => {
+  const fadeDelay = safeDuration > 700 ? safeDuration - 500 : 200
+
+  toastFadeTimer.value = window.setTimeout(() => {
     toastFading.value = true
-  }, safeDuration - 500)
+  }, fadeDelay)
 
-  toastTimer = window.setTimeout(() => {
+  toastTimer.value = window.setTimeout(() => {
     toast.value = null
-    toastTimer = null
-    toastFadeTimer = null
+    toastTimer.value = null
+    toastFadeTimer.value = null
   }, safeDuration)
 }
 
@@ -124,12 +126,12 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (toastTimer !== null) {
-    clearTimeout(toastTimer)
+  if (toastTimer.value !== null) {
+    clearTimeout(toastTimer.value)
   }
 
-  if (toastFadeTimer !== null) {
-    clearTimeout(toastFadeTimer)
+  if (toastFadeTimer.value !== null) {
+    clearTimeout(toastFadeTimer.value)
   }
 })
 </script>
