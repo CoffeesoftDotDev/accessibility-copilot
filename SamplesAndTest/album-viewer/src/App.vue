@@ -66,6 +66,10 @@ const toast = ref<string | null>(null)
 const toastFading = ref(false)
 const toastTimer = ref<number | null>(null)
 const toastFadeTimer = ref<number | null>(null)
+const MIN_TOAST_DURATION_MS = 5000
+const TOAST_FADE_DURATION_MS = 500
+const MIN_DURATION_FOR_FADE_MS = 700
+const FALLBACK_FADE_DELAY_MS = 200
 
 const openPreview = (album: Album) => {
   previewAlbum.value = album
@@ -75,8 +79,8 @@ const closePreview = () => {
   previewAlbum.value = null
 }
 
-const showToast = (message: string, duration = 5000): void => {
-  const safeDuration = Math.max(duration, 500)
+const showToast = (message: string, duration = MIN_TOAST_DURATION_MS): void => {
+  const safeDuration = Math.max(duration, MIN_TOAST_DURATION_MS)
 
   toast.value = message
   toastFading.value = false
@@ -89,7 +93,9 @@ const showToast = (message: string, duration = 5000): void => {
     clearTimeout(toastFadeTimer.value)
   }
 
-  const fadeDelay = safeDuration > 700 ? safeDuration - 500 : 200
+  const fadeDelay = safeDuration > MIN_DURATION_FOR_FADE_MS
+    ? safeDuration - TOAST_FADE_DURATION_MS
+    : FALLBACK_FADE_DELAY_MS
 
   toastFadeTimer.value = window.setTimeout(() => {
     toastFading.value = true
