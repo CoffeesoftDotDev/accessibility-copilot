@@ -109,7 +109,7 @@ const showToast = (message: string, duration = MIN_TOAST_DURATION_MS): void => {
 }
 
 const handleAddToCart = (album: Album): void => {
-  showToast(`${album.title} by ${album.artist} added to cart.`, 5000)
+  showToast(`${album.title} by ${album.artist} added to cart.`)
 }
 
 const fetchAlbums = async (): Promise<void> => {
@@ -118,7 +118,7 @@ const fetchAlbums = async (): Promise<void> => {
     error.value = null
     const data = await fetchMockAlbums()
     albums.value = data
-    showToast('Albums loaded!', 5000)
+    showToast('Albums loaded!')
   } catch (err) {
     error.value = 'Something went wrong.'
     console.error('Error fetching albums:', err)
