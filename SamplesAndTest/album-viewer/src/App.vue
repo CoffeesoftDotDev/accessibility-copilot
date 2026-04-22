@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { fetchAlbums as fetchMockAlbums } from './stores/mockAlbumService'
 import AlbumCard from './components/AlbumCard.vue'
 import AlbumPreview from './components/AlbumPreview.vue'
@@ -76,6 +76,8 @@ const closePreview = () => {
 }
 
 const showToast = (message: string, duration = 5000): void => {
+  const safeDuration = Math.max(duration, 500)
+
   toast.value = message
   toastFading.value = false
 
@@ -89,13 +91,13 @@ const showToast = (message: string, duration = 5000): void => {
 
   toastFadeTimer = window.setTimeout(() => {
     toastFading.value = true
-  }, Math.max(duration - 500, 0))
+  }, safeDuration - 500)
 
   toastTimer = window.setTimeout(() => {
     toast.value = null
     toastTimer = null
     toastFadeTimer = null
-  }, duration)
+  }, safeDuration)
 }
 
 const handleAddToCart = (album: Album): void => {
@@ -119,6 +121,16 @@ const fetchAlbums = async (): Promise<void> => {
 
 onMounted(() => {
   fetchAlbums()
+})
+
+onUnmounted(() => {
+  if (toastTimer !== null) {
+    clearTimeout(toastTimer)
+  }
+
+  if (toastFadeTimer !== null) {
+    clearTimeout(toastFadeTimer)
+  }
 })
 </script>
 
