@@ -64,11 +64,11 @@ const error = ref<string | null>(null)
 const previewAlbum = ref<Album | null>(null)
 const toast = ref<string | null>(null)
 const toastFading = ref(false)
-const toastTimer = ref<number | null>(null)
-const toastFadeTimer = ref<number | null>(null)
+const toastTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const toastFadeTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const MIN_TOAST_DURATION_MS = 5000
 const TOAST_FADE_DURATION_MS = 500
-const MIN_DURATION_FOR_FADE_MS = 700
+const FADE_THRESHOLD_MS = 700
 const FALLBACK_FADE_DELAY_MS = 200
 
 const openPreview = (album: Album) => {
@@ -93,7 +93,7 @@ const showToast = (message: string, duration = MIN_TOAST_DURATION_MS): void => {
     clearTimeout(toastFadeTimer.value)
   }
 
-  const fadeDelay = safeDuration > MIN_DURATION_FOR_FADE_MS
+  const fadeDelay = safeDuration > FADE_THRESHOLD_MS
     ? safeDuration - TOAST_FADE_DURATION_MS
     : FALLBACK_FADE_DELAY_MS
 
