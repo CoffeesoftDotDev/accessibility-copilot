@@ -31,7 +31,10 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ (e: 'preview', album: Album): void }>()
+const emit = defineEmits<{
+  (e: 'preview', album: Album): void
+  (e: 'add-to-cart', album: Album): void
+}>()
 const cartStore = useCartStore()
 
 const handleImageError = (event: Event): void => {
@@ -41,6 +44,7 @@ const handleImageError = (event: Event): void => {
 
 const addToCart = () => {
   cartStore.addToCart(props.album)
+  emit('add-to-cart', props.album)
 }
 
 const openPreview = () => {

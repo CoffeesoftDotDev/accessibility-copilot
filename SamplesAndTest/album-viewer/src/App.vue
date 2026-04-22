@@ -26,6 +26,7 @@
           :key="album.id" 
           :album="album"
           @preview="openPreview"
+          @add-to-cart="handleAddToCart"
         />
       </div>
     </div>
@@ -34,7 +35,14 @@
     <CheckoutForm />
     <AlbumPreview :album="previewAlbum" @close="closePreview" />
 
-    <div v-if="toast" class="toast" :class="{ 'toast-fade': toastFading }">
+    <div
+      v-if="toast"
+      class="toast"
+      :class="{ 'toast-fade': toastFading }"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       {{ toast }}
     </div>
   </div>
@@ -56,6 +64,8 @@ const error = ref<string | null>(null)
 const previewAlbum = ref<Album | null>(null)
 const toast = ref<string | null>(null)
 const toastFading = ref(false)
+let toastTimer: number | null = null
+let toastFadeTimer: number | null = null
 
 const openPreview = (album: Album) => {
   previewAlbum.value = album
@@ -65,16 +75,40 @@ const closePreview = () => {
   previewAlbum.value = null
 }
 
+const showToast = (message: string, duration = 5000): void => {
+  toast.value = message
+  toastFading.value = false
+
+  if (toastTimer !== null) {
+    clearTimeout(toastTimer)
+  }
+
+  if (toastFadeTimer !== null) {
+    clearTimeout(toastFadeTimer)
+  }
+
+  toastFadeTimer = window.setTimeout(() => {
+    toastFading.value = true
+  }, Math.max(duration - 500, 0))
+
+  toastTimer = window.setTimeout(() => {
+    toast.value = null
+    toastTimer = null
+    toastFadeTimer = null
+  }, duration)
+}
+
+const handleAddToCart = (album: Album): void => {
+  showToast(`${album.title} by ${album.artist} added to cart.`, 5000)
+}
+
 const fetchAlbums = async (): Promise<void> => {
   try {
     loading.value = true
     error.value = null
     const data = await fetchMockAlbums()
     albums.value = data
-    toast.value = 'Albums loaded!'
-    toastFading.value = false
-    setTimeout(() => { toastFading.value = true }, 1500)
-    setTimeout(() => { toast.value = null }, 2000)
+    showToast('Albums loaded!', 5000)
   } catch (err) {
     error.value = 'Something went wrong.'
     console.error('Error fetching albums:', err)
