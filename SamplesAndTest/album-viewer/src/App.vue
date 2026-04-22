@@ -26,6 +26,7 @@
           :key="album.id" 
           :album="album"
           @preview="openPreview"
+          @add-to-cart="handleAddToCart"
         />
       </div>
     </div>
@@ -34,20 +35,28 @@
     <CheckoutForm />
     <AlbumPreview :album="previewAlbum" @close="closePreview" />
 
-    <div v-if="toast" class="toast" :class="{ 'toast-fade': toastFading }">
+    <div
+      v-if="toast"
+      class="toast"
+      :class="{ 'toast-fade': toastFading }"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       {{ toast }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onBeforeUnmount, onMounted } from 'vue'
 import { fetchAlbums as fetchMockAlbums } from './stores/mockAlbumService'
 import AlbumCard from './components/AlbumCard.vue'
 import AlbumPreview from './components/AlbumPreview.vue'
 import CartIcon from './components/CartIcon.vue'
 import CartOverlay from './components/CartOverlay.vue'
 import CheckoutForm from './components/CheckoutForm.vue'
+import { useCartStore } from './stores/cartStore'
 import type { Album } from './types/album'
 
 const albums = ref<Album[]>([])
@@ -56,6 +65,31 @@ const error = ref<string | null>(null)
 const previewAlbum = ref<Album | null>(null)
 const toast = ref<string | null>(null)
 const toastFading = ref(false)
+const cartStore = useCartStore()
+let toastFadeTimeout: ReturnType<typeof setTimeout> | null = null
+let toastHideTimeout: ReturnType<typeof setTimeout> | null = null
+
+const clearToastTimers = () => {
+  if (toastFadeTimeout) {
+    clearTimeout(toastFadeTimeout)
+    toastFadeTimeout = null
+  }
+  if (toastHideTimeout) {
+    clearTimeout(toastHideTimeout)
+    toastHideTimeout = null
+  }
+}
+
+const showToast = (message: string, duration = 5000) => {
+  clearToastTimers()
+  toast.value = message
+  toastFading.value = false
+
+  const fadeDuration = 500
+  const fadeDelay = Math.max(0, duration - fadeDuration)
+  toastFadeTimeout = setTimeout(() => { toastFading.value = true }, fadeDelay)
+  toastHideTimeout = setTimeout(() => { toast.value = null }, duration)
+}
 
 const openPreview = (album: Album) => {
   previewAlbum.value = album
@@ -71,10 +105,7 @@ const fetchAlbums = async (): Promise<void> => {
     error.value = null
     const data = await fetchMockAlbums()
     albums.value = data
-    toast.value = 'Albums loaded!'
-    toastFading.value = false
-    setTimeout(() => { toastFading.value = true }, 1500)
-    setTimeout(() => { toast.value = null }, 2000)
+    showToast('Albums loaded!')
   } catch (err) {
     error.value = 'Something went wrong.'
     console.error('Error fetching albums:', err)
@@ -83,8 +114,17 @@ const fetchAlbums = async (): Promise<void> => {
   }
 }
 
+const handleAddToCart = (album: Album) => {
+  cartStore.addToCart(album)
+  showToast(`${album.title} by ${album.artist} added to cart`)
+}
+
 onMounted(() => {
   fetchAlbums()
+})
+
+onBeforeUnmount(() => {
+  clearToastTimers()
 })
 </script>
 

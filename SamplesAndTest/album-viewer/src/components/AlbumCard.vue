@@ -24,15 +24,16 @@
 
 <script setup lang="ts">
 import type { Album } from '../types/album'
-import { useCartStore } from '../stores/cartStore'
 
 interface Props {
   album: Album
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ (e: 'preview', album: Album): void }>()
-const cartStore = useCartStore()
+const emit = defineEmits<{
+  (e: 'preview', album: Album): void
+  (e: 'add-to-cart', album: Album): void
+}>()
 
 const handleImageError = (event: Event): void => {
   const target = event.target as HTMLImageElement
@@ -40,7 +41,7 @@ const handleImageError = (event: Event): void => {
 }
 
 const addToCart = () => {
-  cartStore.addToCart(props.album)
+  emit('add-to-cart', props.album)
 }
 
 const openPreview = () => {
