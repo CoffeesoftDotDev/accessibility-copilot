@@ -83,7 +83,100 @@ The app contains 21 intentional violations across 4 areas:
 
 ---
 
+## Fork & Setup Guide
+
+If you fork this repo, you need to configure a **GitHub App** and a **Copilot token** for the agentic workflows to run.
+
+### 1. Create a GitHub App
+
+1. Go to **Settings → Developer settings → GitHub Apps → New GitHub App**
+2. Fill in the basics:
+   - **Name**: e.g. `a11y-copilot-bot`
+   - **Homepage URL**: your repo URL
+   - **Webhook**: uncheck "Active" (not needed)
+3. Set **repository permissions**:
+
+   | Permission | Access | Why |
+   |-----------|--------|-----|
+   | **Contents** | Read | Read source files during audit |
+   | **Issues** | Read & Write | Create issues for findings |
+   | **Pull requests** | Read & Write | Post review comments on PRs |
+   | **Metadata** | Read | Required by default |
+
+4. Click **Create GitHub App**
+5. Note the **App ID** displayed on the app's settings page
+6. Scroll to **Private keys** → **Generate a private key** — a `.pem` file downloads
+
+### 2. Install the GitHub App
+
+1. From the app's settings page, click **Install App** in the left sidebar
+2. Select your fork's account/org
+3. Choose **Only select repositories** → pick your fork
+4. Click **Install**
+
+### 3. Configure Repository Secrets & Variables
+
+Go to your fork: **Settings → Secrets and variables → Actions**
+
+#### Variables (tab: Variables)
+
+| Name | Value |
+|------|-------|
+| `APP_ID` | The App ID from step 1 |
+
+#### Secrets (tab: Secrets)
+
+| Name | Value |
+|------|-------|
+| `APP_PRIVATE_KEY` | The full contents of the `.pem` file from step 1 |
+
+These are referenced by the agentic workflows in `.github/workflows/a11y-pr-review.md` and `a11y-scheduled-audit.md`:
+```yaml
+github-app:
+  app-id: ${{ vars.APP_ID }}
+  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+```
+
+### 4. Copilot as the AI Engine
+
+The agentic workflows use **GitHub Copilot** as the default AI engine. This requires:
+
+- **GitHub Copilot** enabled on your account/org (Business or Enterprise plan)
+- The repository must have **GitHub Actions** enabled
+- No additional secret is needed — Copilot authentication is handled automatically by the `gh-aw` runtime via the `GITHUB_TOKEN` provided by Actions
+
+> **Alternative AI engines**: If you want to use a different model, add the corresponding secret and update the workflow configuration:
+>
+> | Engine | Secret name | Docs |
+> |--------|------------|------|
+> | Anthropic (Claude) | `ANTHROPIC_API_KEY` | [gh-aw auth docs](https://github.github.com/gh-aw/reference/auth/) |
+> | OpenAI (Codex) | `OPENAI_API_KEY` | [gh-aw auth docs](https://github.github.com/gh-aw/reference/auth/) |
+
+### 5. Compile the Agentic Workflows
+
+After forking and configuring secrets, compile the lock files:
+
+```bash
+gh extension install github/gh-aw
+gh aw compile
+```
+
+The `.lock.yml` files are already committed in this repo. You only need to recompile if you modify the `.md` workflow files.
+
+### Quick Checklist
+
+- [ ] GitHub App created with Contents (read), Issues (read/write), Pull requests (read/write)
+- [ ] App installed on the fork
+- [ ] `APP_ID` added as repository **variable**
+- [ ] `APP_PRIVATE_KEY` added as repository **secret**
+- [ ] GitHub Copilot enabled on the account/org
+- [ ] GitHub Actions enabled on the fork
+
+---
+
 ## References
 
 - [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/?versions=2.2)
 - [awesome-copilot accessibility instructions](https://github.com/github/awesome-copilot/blob/main/instructions/a11y.instructions.md)
+- [GitHub Agentic Workflows docs](https://github.github.com/gh-aw/)
+- [gh-aw authentication reference](https://github.github.com/gh-aw/reference/auth/)
