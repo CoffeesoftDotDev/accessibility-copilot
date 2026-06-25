@@ -101,7 +101,10 @@ If you fork this repo, you need to configure a **GitHub App** and a **Copilot to
    | **Contents** | Read | Read source files during audit |
    | **Issues** | Read & Write | Create issues for findings |
    | **Pull requests** | Read & Write | Post review comments on PRs |
+   | **Discussions** | Read & Write | Required by the `safe-outputs` token minted by `gh-aw` |
    | **Metadata** | Read | Required by default |
+
+   > **Why Discussions?** Even though this workflow only posts comments and creates issues, `gh-aw` mints the `safe-outputs` GitHub App token with `discussions: write`. If the App is missing this permission, every run fails with *"The permissions requested are not granted to this installation"* and a follow-up *"Input required and not supplied: github-token"* error. Granting **Discussions: Read & Write** resolves both.
 
 4. Click **Create GitHub App**
 5. Note the **App ID** displayed on the app's settings page
@@ -113,6 +116,8 @@ If you fork this repo, you need to configure a **GitHub App** and a **Copilot to
 2. Select your fork's account/org
 3. Choose **Only select repositories** → pick your fork
 4. Click **Install**
+
+> **Already installed the App before adding a permission?** Permission changes are **not** applied automatically. Go to **Settings → GitHub Apps → Configure** your App and accept the prompt to grant the newly requested permissions (e.g. Discussions) for the repository. Until you accept, token minting keeps failing.
 
 ### 3. Configure Repository Secrets & Variables
 
@@ -152,7 +157,29 @@ The agentic workflows use **GitHub Copilot** as the default AI engine. This requ
 > | Anthropic (Claude) | `ANTHROPIC_API_KEY` | [gh-aw auth docs](https://github.github.com/gh-aw/reference/auth/) |
 > | OpenAI (Codex) | `OPENAI_API_KEY` | [gh-aw auth docs](https://github.github.com/gh-aw/reference/auth/) |
 
-### 5. Compile the Agentic Workflows
+### 5. Allow Network Access to w3.org
+
+The agentic workflows run inside a network firewall that only permits a default
+allowlist of domains. The audit reads WCAG references from **w3.org**, which is
+**not** in the defaults — so you must whitelist it explicitly, otherwise fetches
+to `https://www.w3.org/...` are blocked (and URLs may appear as `(redacted)` in
+the output).
+
+Add a top-level `network` block to each workflow `.md` file
+(`.github/workflows/a11y-pr-review.md` and `a11y-scheduled-audit.md`):
+
+```yaml
+network:
+  allowed:
+    - defaults    # keep the built-in infrastructure allowlist
+    - "w3.org"    # WCAG references (matches www.w3.org and all subdomains)
+```
+
+> A listed domain automatically matches all of its subdomains, so `w3.org`
+> covers `www.w3.org`. After editing the `.md` files, recompile (see next step)
+> so the change is written into the `.lock.yml` files.
+
+### 6. Compile the Agentic Workflows
 
 After forking and configuring secrets, compile the lock files:
 
@@ -165,10 +192,11 @@ The `.lock.yml` files are already committed in this repo. You only need to recom
 
 ### Quick Checklist
 
-- [ ] GitHub App created with Contents (read), Issues (read/write), Pull requests (read/write)
-- [ ] App installed on the fork
+- [ ] GitHub App created with Contents (read), Issues (read/write), Pull requests (read/write), Discussions (read/write)
+- [ ] App installed on the fork (and new permissions accepted if added after install)
 - [ ] `APP_ID` added as repository **variable**
 - [ ] `APP_PRIVATE_KEY` added as repository **secret**
+- [ ] `w3.org` added to the `network.allowed` list in the workflow `.md` files
 - [ ] GitHub Copilot enabled on the account/org
 - [ ] GitHub Actions enabled on the fork
 
