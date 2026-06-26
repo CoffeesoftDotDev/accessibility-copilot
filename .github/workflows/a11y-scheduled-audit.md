@@ -38,6 +38,7 @@ tools:
       app-id: ${{ vars.APP_ID }}
       private-key: ${{ secrets.APP_PRIVATE_KEY }}
   playwright:
+    mode: cli
   edit:
   bash: ["cat", "ls", "find", "grep", "head", "tail", "wc", "sort", "date"]
   web-fetch:

@@ -27,6 +27,7 @@ tools:
       app-id: ${{ vars.APP_ID }}
       private-key: ${{ secrets.APP_PRIVATE_KEY }}
   playwright:
+    mode: cli
   edit:
   bash: ["cat", "ls", "find", "grep", "head", "tail", "wc", "sort"]
   web-fetch:
@@ -117,7 +118,7 @@ Determine if a preview/deployment URL is available by checking:
 ### PR Comment
 
 Post a summary comment on the PR with:
-- **Executive summary**: ≤ 10 bullets (≤ 18 words each) of High/Medium findings
+- **Executive summary**: ≤ 10 bullets (≤ 20 words each) of High/Medium findings
 - **Totals**: Count of High / Medium / Low findings
 - **Top 3 dimensions** with most issues (e.g., Keyboard, Recovery, Feedback)
 - **Verdict**: ✅ No blockers / ⚠️ Issues found / ❌ Critical blockers
@@ -125,7 +126,7 @@ Post a summary comment on the PR with:
 
 ### Create Issues (for actionable findings only)
 
-Create individual GitHub issues ONLY for **High and Medium severity** findings. Apply these rules strictly:
+Create individual GitHub issues ONLY for **High and Medium severity** findings and assign them directly to copilot coding agent. Apply these rules strictly:
 
 - **Deduplicate**: Do not create multiple issues for the same underlying problem
 - **Cap**: Create at most 10 issues per review
