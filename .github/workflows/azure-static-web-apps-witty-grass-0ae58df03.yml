@@ -28,11 +28,27 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./SamplesAndTest" # App source code path
+          app_location: "./SamplesAndTest/album-viewer" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
-      - name: 
+
+      - name: Run Accessibility Scanner
+        uses: github/accessibility-scanner@v3
+        with:
+          # Scan the site that was just deployed:
+          #   - push to main -> production URL
+          #   - pull request  -> that PR's preview/staging URL
+          urls: ${{ steps.builddeploy.outputs.static_web_app_url }}
+          # Repository where accessibility issues are filed and where Copilot opens fix PRs
+          repository: Justrebl/GH-agentic-a11y-workflow
+          # Fine-grained PAT with write access to contents/issues/pull-requests/actions + metadata read.
+          # NOTE: the default GITHUB_TOKEN cannot be used here.
+          token: ${{ secrets.ACCESSIBILITY_GH_TOKEN }}
+          # Cache findings between runs so duplicate issues are not filed
+          cache_key: a11y-results-album-viewer.json
+          # Capture screenshots and attach them to filed issues
+          include_screenshots: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
