@@ -34,6 +34,7 @@ jobs:
           ###### End of Repository/Build Configurations ######
 
       - name: Run Accessibility Scanner
+        id: a11y_scan
         uses: github/accessibility-scanner@v3
         with:
           # Scan the site that was just deployed:
@@ -49,6 +50,50 @@ jobs:
           cache_key: a11y-results-album-viewer.json
           # Capture screenshots and attach them to filed issues
           include_screenshots: true
+
+      # The scanner writes a JSON results file (its `results_file` output points to
+      # scanner-results.json). It is an array of filings, each with a `findings`
+      # array plus the `issue` (and optional `pullRequest`) that was opened.
+      # This step prints that file and passes/fails the job based on the finding count.
+      - name: Report accessibility results
+        if: always() && steps.a11y_scan.outcome != 'skipped'
+        shell: bash
+        env:
+          RESULTS_FILE: ${{ steps.a11y_scan.outputs.results_file }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${RESULTS_FILE:-}" ] || [ ! -f "${RESULTS_FILE}" ]; then
+            echo "::error::No results file was produced by the accessibility scanner."
+            exit 1
+          fi
+
+          echo "::group::Accessibility scanner results (${RESULTS_FILE})"
+          cat "${RESULTS_FILE}"
+          echo
+          echo "::endgroup::"
+
+          # Count total findings across every filed result, and how many issues were filed/updated.
+          FINDINGS=$(jq '[.[] | (.findings // []) | length] | add // 0' "${RESULTS_FILE}")
+          ISSUES=$(jq 'length' "${RESULTS_FILE}")
+
+          echo "Issues filed/updated: ${ISSUES}"
+          echo "Total accessibility findings: ${FINDINGS}"
+
+          {
+            echo "### ♿ Accessibility scan summary"
+            echo ""
+            echo "- **Total findings:** ${FINDINGS}"
+            echo "- **Issues filed/updated:** ${ISSUES}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [ "${FINDINGS}" -gt 0 ]; then
+            echo "::warning::Accessibility scan found ${FINDINGS} finding(s). See the filed issues for details."
+            echo "- **Status:** ⚠️ Findings detected (tracked as issues)" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "No accessibility findings detected."
+            echo "- **Status:** ✅ PASS" >> "${GITHUB_STEP_SUMMARY}"
+          fi
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
