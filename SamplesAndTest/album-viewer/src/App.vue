@@ -28,6 +28,8 @@
           @preview="openPreview"
         />
       </div>
+
+      <ConcertsSection />
     </div>
     
     <CartOverlay />
@@ -48,6 +50,7 @@ import AlbumPreview from './components/AlbumPreview.vue'
 import CartIcon from './components/CartIcon.vue'
 import CartOverlay from './components/CartOverlay.vue'
 import CheckoutForm from './components/CheckoutForm.vue'
+import ConcertsSection from './components/ConcertsSection.vue'
 import type { Album } from './types/album'
 
 const albums = ref<Album[]>([])
