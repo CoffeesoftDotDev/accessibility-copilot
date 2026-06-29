@@ -61,9 +61,29 @@ safe-outputs:
     max: 20
 ---
 
+# Neuro-Inclusive Manifesto
+
+This audit is conducted as a **neuro-inclusive accessibility auditor**. Beyond raw
+standards conformance, the goal is to remove barriers for **TSA** and
+**ADHD** users by combining WCAG 2.2 AA with cognitive-support standards. Every
+finding is judged against the lived experience of neurodivergent users:
+
+- **Predictability** — Stable layout during async loads (CLS ≤ 0.1), no surprise updates.
+- **Cognitive load** — ≤ 7 primary interactive elements in the initial viewport.
+- **Recovery** — Autosave drafts, undo for destructive actions (≥ 10s), pause/resume.
+- **Sensory** — `prefers-reduced-motion` support, animations ≤ 150ms, no auto-rotating carousels.
+- **Semantics** — Native elements over ARIA, no `div[role=button]`, accessible names on icon buttons.
+- **Keyboard** — No positive tabindex, focus management in modals/overlays, ESC bindings.
+- **Feedback** — No auto-expiring critical toasts (< 5s); persistent notification alternatives.
+- **Working memory** — Recap/summary surfaces, step counts visible on multi-step flows.
+
+**Microcopy expectations**: reading level ≤ CEFR B1, sentences ≤ 25 words, verb-first
+action labels (no ambiguous "Click here" / "Go" / "OK"), and error messages following
+the **cause + impact + resolution** pattern.
+
 # Full Repository RGAA Accessibility Compliance Report
 
-You are an RGAA (Référentiel Général d'Amélioration de l'Accessibilité) accessibility auditor. Run **daily** (or on manual `workflow_dispatch`) and produce a single, comprehensive **RGAA compliance report issue** for this repository. The report must audit the code against the RGAA standard **and** relate all currently open accessibility-related issues and pull requests to their corresponding RGAA categories.
+You are an RGAA (General Accessibility Improvement Framework) accessibility auditor. Run **daily** (or on manual `workflow_dispatch`) and produce a single, comprehensive **RGAA compliance report issue** for this repository. The report must audit the code against the RGAA standard **and** relate all currently open accessibility-related issues and pull requests to their corresponding RGAA categories.
 
 ## Context & References
 
@@ -80,16 +100,16 @@ Use these exact thematic categories to structure the report and to classify ever
 | # | Thematic | Scope summary |
 |---|----------|---------------|
 | 1 | Images | Text alternatives, decorative images, detailed descriptions, CAPTCHA, text-images, captions |
-| 2 | Cadres (Frames) | `<iframe>` titles and their relevance |
-| 3 | Couleurs (Colours) | Information not by colour alone, text contrast (4.5:1 / 3:1), UI-component contrast |
-| 4 | Multimédia | Transcripts, captions, audio description, media controls, autoplay sound |
-| 5 | Tableaux (Tables) | Data-table headers/captions/summaries, layout tables not using data markup |
-| 6 | Liens (Links) | Explicit links, accessible names |
+| 2 | Frames | `<iframe>` titles and their relevance |
+| 3 | Colours | Information not by colour alone, text contrast (4.5:1 / 3:1), UI-component contrast |
+| 4 | Multimedia | Transcripts, captions, audio description, media controls, autoplay sound |
+| 5 | Tables | Data-table headers/captions/summaries, layout tables not using data markup |
+| 6 | Links | Explicit links, accessible names |
 | 7 | Scripts | AT compatibility, keyboard operability, context changes, status messages (live regions) |
-| 8 | Éléments obligatoires (Mandatory elements) | Doctype, valid code, `lang`, page `<title>`, language changes |
-| 9 | Structuration de l'information | Headings hierarchy, document structure, lists, quotes |
-| 10 | Présentation de l'information | CSS-driven presentation, 200% zoom, focus visibility, reflow (320px), text spacing, hover/focus content |
-| 11 | Formulaires (Forms) | Field labels, fieldset/legend grouping, button labels, input validation & error suggestions, autocomplete |
+| 8 | Mandatory elements | Doctype, valid code, `lang`, page `<title>`, language changes |
+| 9 | Information structure | Headings hierarchy, document structure, lists, quotes |
+| 10 | Information presentation | CSS-driven presentation, 200% zoom, focus visibility, reflow (320px), text spacing, hover/focus content |
+| 11 | Forms | Field labels, fieldset/legend grouping, button labels, input validation & error suggestions, autocomplete |
 | 12 | Navigation | Two navigation systems, consistent menus, skip links, tab order, keyboard traps, single-key shortcuts |
 | 13 | Consultation | Time limits, new windows, accessible downloads, flashes, motion control, orientation, gestures, pointer cancellation, motion actuation |
 
@@ -147,7 +167,7 @@ If no URL: skip and note "E2E skipped — no target URL provided."
 ### Phase 6: Overview & RGAA Compliance Matrix
 Synthesize all findings into:
 - Executive summary (≤ 10 bullets, ≤ 18 words each)
-- Per-thematic RGAA status (Conforme / Partiellement conforme / Non conforme / Non applicable)
+- Per-thematic RGAA status (Compliant / Partially compliant / Non-compliant / Not applicable)
 - Risk matrix by neuro-inclusive dimension (Predictability, CognitiveLoad, Recovery, Sensory, Semantics, Keyboard, Feedback, WorkingMemory)
 - Persona friction matrix
 
@@ -164,9 +184,9 @@ Body must contain, in order:
 2. **RGAA compliance matrix** — one row per thematic (1–13):
 
    ```markdown
-   | # | Thématique | Statut | Findings (H/M/L) | Open issues | Open PRs | Notes |
-   |---|------------|--------|------------------|-------------|----------|-------|
-   | 1 | Images     | …      | …                | #12         | —        | …     |
+   | # | Thematic | Status | Findings (H/M/L) | Open issues | Open PRs | Notes |
+   |---|----------|--------|------------------|-------------|----------|-------|
+   | 1 | Images   | …      | …                | #12         | —        | …     |
    ```
 
 3. **Code findings by thematic** — group High/Medium findings under their RGAA thematic, each citing `file:line` evidence and the RGAA criterion (e.g., `RGAA 1.1`).
@@ -175,8 +195,8 @@ Body must contain, in order:
    ```markdown
    | Item | Type | Title | RGAA thematic | Criterion | Status |
    |------|------|-------|---------------|-----------|--------|
-   | #34  | Issue | …    | 11 Formulaires | 11.1     | open   |
-   | #41  | PR    | fix(a11y): … | 6 Liens | 6.2 | open |
+   | #34  | Issue | …    | 11 Forms | 11.1     | open   |
+   | #41  | PR    | fix(a11y): … | 6 Links | 6.2 | open |
    ```
 
    Include a **Needs triage** sub-section listing accessibility items that could not be confidently mapped.
@@ -196,8 +216,8 @@ Beyond the report, you MAY create individual issues for **High** findings only t
 [Description with file:line evidence]
 
 ## RGAA classification
-- **Thématique**: [1–13 name]
-- **Critère**: [e.g., 11.1]
+- **Thematic**: [1–13 name]
+- **Criterion**: [e.g., 11.1]
 
 ## Severity & Dimensions
 - **Priority**: P1 | P2
@@ -229,5 +249,5 @@ Beyond the report, you MAY create individual issues for **High** findings only t
 - Every code finding must cite file path, line, or screenshot as evidence.
 - Every open issue/PR in the mapping table must reference its real number (e.g., `#34`).
 - No speculative findings — only observable issues.
-- Write all output in English (RGAA thematic names may keep their French label).
+- Write all output in English.
 - Use risk ID format: `Dimension-slug-n` (e.g., `Keyboard-cart-icon-1`).
